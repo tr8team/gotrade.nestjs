@@ -4,9 +4,9 @@ import {
   <% nameUpper %>,
   <% nameUpper %>Principal,
   <% nameUpper %>Record,
-} from '../../../src/sample/domain/models/<% name %>.model';
-import { I<% nameUpper %>Repository } from '../../../src/sample/domain/<% name %>.repository';
-import { <% nameUpper %>Service } from '../../../src/sample/domain/<% name %>.service';
+} from '../../../src/<% module %>/domain/models/<% name %>.model';
+import { I<% nameUpper %>Repository } from '../../../src/<% module %>/domain/<% name %>.repository';
+import { <% nameUpper %>Service } from '../../../src/<% module %>/domain/<% name %>.service';
 <% test.unit.service.imports %>
 
 const should = s();

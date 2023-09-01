@@ -143,6 +143,7 @@ async function genUnitTest(
         .replace('.eta', '.ts')
         .replace(`${module}/person.`, `${module}/${resource}.`),
       src.render(read, {
+        module,
         version: 1,
         dbName,
         nameUpper,

@@ -180,14 +180,22 @@ class AllGenerator {
       fields.map(([name, g]) => g.test_unit_data_fromPrincipal_pair(name)),
     );
 
-    const r = faker.number.int({ min: 1, max: 5 });
+    const r = faker.number.int({ min: 2, max: 5 });
     const search = fields
       .map(([name, g]) => g.test_unit_service_search(name, r))
       .reduce(
         (prev, next) => next.map((item, i) => (prev[i] || []).concat(next[i])),
         [] as string[][],
       )
-      .map(x => `{\n${indentString(x.join(os.EOL), 2)}\n},`)
+      .map(
+        x =>
+          `{
+  id: '${faker.string.uuid()}',
+  record: {
+${indentString(x.join(os.EOL), 4)}
+  },
+},`,
+      )
       .join(os.EOL);
 
     return {

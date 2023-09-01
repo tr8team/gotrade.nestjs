@@ -3,16 +3,16 @@ import {
   <% nameUpper %>,
   <% nameUpper %>Principal,
   <% nameUpper %>Record,
-} from '../../../src/sample/domain/models/<% name %>.model';
-import { <% nameUpper %>ApiV1Mapper } from '../../../src/sample/adapters/api/v1/<% name %>.mapper';
+} from '../../../src/<% module %>/domain/models/<% name %>.model';
+import { <% nameUpper %>ApiV1Mapper } from '../../../src/<% module %>/adapters/api/v1/<% name %>.mapper';
 import {
   Create<% nameUpper %>Req,
   Update<% nameUpper %>Req,
-} from '../../../src/sample/adapters/api/v1/dto/<% name %>.req';
+} from '../../../src/<% module %>/adapters/api/v1/dto/<% name %>.req';
 import {
   <% nameUpper %>PrincipalRes,
   <% nameUpper %>Res,
-} from '../../../src/sample/adapters/api/v1/dto/<% name %>.res';
+} from '../../../src/<% module %>/adapters/api/v1/dto/<% name %>.res';
 <% test.unit.api.imports %>
 
 s();
