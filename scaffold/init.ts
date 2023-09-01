@@ -344,6 +344,7 @@ async function main() {
       del(path.resolve(__dirname, '../infra/root_chart/*.yaml')),
       del(path.resolve(__dirname, '../ci.yaml')),
       del(path.resolve(__dirname, '../tests/controller.spec')),
+      del(path.resolve(__dirname, '../person.yaml')),
     ]);
     const [platform, service] = await start();
     sync();
