@@ -328,7 +328,7 @@ ${indentString(x.join(os.EOL), 4)}
                 fields
                   .map(([name, g]) => g.test_unit_service_get_model(name))
                   .join(os.EOL),
-                12,
+                16,
               ),
               id: faker.string.uuid(),
               id2: faker.string.uuid(),

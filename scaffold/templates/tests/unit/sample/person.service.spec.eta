@@ -55,12 +55,22 @@ describe('I<% nameUpper %>Service', () => {
       it('should return the blog with the id', async () => {
         const repo = buildMock({
           get: {
+            principal: {
+              id: '<% test.unit.service.get.id %>',
+              record: {
 <% test.unit.service.get.model %>
+              },
+            },
           },
         });
         const subj = new <% nameUpper %>Service(repo);
         const ex: <% nameUpper %> = {
+          principal: {
+            id: '<% test.unit.service.get.id %>',
+            record: {
 <% test.unit.service.get.model %>
+            },
+          },
         };
 
         const act = await subj.get('<% test.unit.service.get.id %>');
