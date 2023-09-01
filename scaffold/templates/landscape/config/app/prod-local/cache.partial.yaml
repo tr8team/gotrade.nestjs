@@ -1,0 +1,6 @@
+
+<% name %>:
+  dev:
+    autoSeed: false
+  migration:
+    autoSeed: true

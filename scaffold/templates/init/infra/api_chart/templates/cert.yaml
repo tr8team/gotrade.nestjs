@@ -1,0 +1,18 @@
+{{-  range $k, $v := .Values.ingress.tls -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "<% platform %>-<% service %>-api.fullname-with-suffix" (dict "arg" $v.secretName "root" $) }}
+  labels: {{- include "<% platform %>-<% service %>-api.labels" $ | nindent 4 }}
+  annotations: {{- include "<% platform %>-<% service %>-api.annotations" $ | nindent 4 }}
+spec:
+  secretName: {{ include "<% platform %>-<% service %>-api.fullname-with-suffix" (dict "arg" $v.secretName "root" $) }}
+  issuerRef:
+    name: {{ $v.issuerRef }}
+    kind: ClusterIssuer
+  dnsNames:
+    {{- range $hk, $hv := $v.hosts }}
+    - {{ $hv }}
+    {{- end }}
+---
+{{- end -}}

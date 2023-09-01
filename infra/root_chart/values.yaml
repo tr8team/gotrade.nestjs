@@ -1,0 +1,278 @@
+serviceTree: &serviceTree
+  landscape: develop
+  platform: gotrade
+  service: nestjs
+  layer: "2"
+  team: PBG
+
+secret:
+  name: &secret "gotrade-nestjs-secrets"
+  doppler:
+#    name: gotrade-nestjs-doppler-store
+    enable: false
+#    target: "doppler-secret"
+#    remoteRef: dev/cloudflare-tunnel/token
+#    secretKey: ""
+#    secretStore:
+#      name: doppler-store
+#      kind: ClusterSecretStore
+#    policy:
+#      creation: Owner
+#      deletion: Retain
+  fake:
+    enable: false
+
+migration:
+  serviceTree:
+    <<: *serviceTree
+    designation: migration
+
+  envFromSecret: *secret
+
+  image:
+    repository: gotrade-nestjs-migration
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  command: [ "node", "dist/src/migrate" ]
+
+  mountConfig: true
+
+  config:
+    mode: migration
+
+  imagePullSecrets: [ ]
+
+  serviceAccount:
+    create: false
+    annotations: { }
+    name: ""
+
+  podAnnotations: { }
+
+  podSecurityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+
+  securityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+  #  privileged: false
+  #  seccompProfile:
+  #    type: RuntimeDefault
+  #  allowPrivilegeEscalation: false
+  #  capabilities:
+  #    drop:
+  #      - ALL
+  #  readOnlyRootFilesystem: false
+
+
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
+
+  nodeSelector: { }
+
+  tolerations: [ ]
+
+  affinity: { }
+
+api:
+  envFromSecret: *secret
+  affinity: { }
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  tolerations: [ ]
+  serviceTree:
+    <<: *serviceTree
+    designation: api
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+
+  service:
+    port: 80
+    containerPort: 3000
+    type: ClusterIP
+  autoscaling:
+    enabled: false
+    maxReplicas: 100
+    minReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  image:
+    repository: gotrade-nestjs-template-api
+    pullPolicy: IfNotPresent
+    tag: ""
+  serviceAccount:
+    create: false
+    annotations: { }
+    name: ""
+  podAnnotations: { }
+  nodeSelector: { }
+  imagePullSecrets:
+    - name: regcred
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations: { }
+    hosts:
+      - host: api.nestjs.gotrade.local.lvh.me
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - api.nestjs.gotrade.local.lvh.me
+        secretName: host
+        issuerRef: sample
+  podSecurityContext: { }
+
+  securityContext: { }
+
+  mountConfig: false
+  # override any config you want here
+  config:
+    mode: app
+
+test:
+  envFromSecret: *secret
+  serviceTree:
+    <<: *serviceTree
+    designation: test
+
+  mode: pod
+
+  volume:
+    enable: false
+
+  image:
+    repository: gotrade-nestjs-test
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  command: [ "vitest", "run", "--config", "./config/test/vitest.int.report.config.ts" ]
+
+  mountConfig: true
+
+  config:
+    mode: app
+
+  imagePullSecrets: [ ]
+
+  serviceAccount:
+    create: false
+    annotations: { }
+    name: ""
+
+  podAnnotations: { }
+
+  podSecurityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+
+  securityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+  #  privileged: false
+  #  seccompProfile:
+  #    type: RuntimeDefault
+  #  allowPrivilegeEscalation: false
+  #  capabilities:
+  #    drop:
+  #      - ALL
+  #  readOnlyRootFilesystem: false
+
+
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  nodeSelector: { }
+
+  tolerations: [ ]
+
+  affinity: { }
+
+#--scaffold database start--
+maindb:
+  enable: false
+  nameOverride: "main-database"
+  auth:
+    username: "admin"
+    password: "supersecret"
+    database: "main"
+  primary:
+    persistence:
+      enabled: false
+      size: 8Gi
+  architecture: standalone
+commentdb:
+  enable: false
+  nameOverride: "comment-database"
+  auth:
+    username: "admin"
+    password: "supersecret"
+    database: "comment"
+  primary:
+    persistence:
+      enabled: false
+      size: 8Gi
+  architecture: standalone
+
+#--scaffold database end--
+
+#--scaffold cache start--
+maincache:
+  enable: false
+  nameOverride: "main-cache"
+  storage:
+    enabled: false
+  extraArgs:
+    - --requirepass=supersecret
+
+#--scaffold cache end--
+
+#--scaffold storage start--
+mainstorage:
+  enable: false
+  nameOverride: "main-storage"
+  persistence:
+    enabled: false
+    size: 10Gi
+  auth:
+    rootUser: admin
+    rootPassword: supersecret
+
+#--scaffold storage end--
+
+tags:
+  active: true
+  local: true

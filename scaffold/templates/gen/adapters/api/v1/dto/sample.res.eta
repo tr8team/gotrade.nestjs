@@ -1,0 +1,10 @@
+class <% nameUpper %>PrincipalRes {
+  readonly id!: string;
+<% src.api.model %>
+}
+
+class <% nameUpper %>Res {
+  readonly principal!: <% nameUpper %>PrincipalRes;
+}
+
+export { <% nameUpper %>Res, <% nameUpper %>PrincipalRes };

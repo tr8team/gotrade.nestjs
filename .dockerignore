@@ -1,0 +1,7 @@
+node_modules
+infra
+docker-compose.yaml
+.direnv
+nix
+**/dist
+.git

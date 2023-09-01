@@ -1,0 +1,54 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { InjectEntityManager } from '@mikro-orm/nestjs';
+import { contexts } from '../../../constants';
+import { EntityManager } from '@mikro-orm/core';
+import { <% nameUpper %>DataMapper } from './<% name %>.mapper';
+import { I<% nameUpper %>Repository } from '../../domain/<% name %>.repository';
+import {
+  <% nameUpper %>,
+  <% nameUpper %>Principal,
+  <% nameUpper %>Record,
+} from '../../domain/models/<% name %>.model';
+import { <% nameUpper %>Entity } from './entities/main/<% name %>.entity';
+
+@Injectable()
+export class <% nameUpper %>Repository implements I<% nameUpper %>Repository {
+  constructor(
+    @InjectEntityManager(contexts.<% dbName.toUpperCase() %>)
+    private readonly db: EntityManager,
+    @Inject(<% nameUpper %>DataMapper)
+    private readonly mapper: <% nameUpper %>DataMapper,
+  ) {}
+
+  async create(<% name %>: <% nameUpper %>Record): Promise<<% nameUpper %>Principal> {
+    const data = this.mapper.fromRecord(<% name %>);
+    this.db.create(<% nameUpper %>Entity, data);
+    this.db.persist(data);
+    await this.db.flush();
+    return this.mapper.toPrincipal(data);
+  }
+
+  async delete(id: string): Promise<void> {
+    const <% name %> = this.db.getReference(<% nameUpper %>Entity, id);
+    await this.db.remove(<% name %>).flush();
+  }
+
+  async get(id: string): Promise<<% nameUpper %> | null> {
+    const <% name %> = await this.db.findOne(<% nameUpper %>Entity, id);
+    if (!<% name %>) return null;
+    return this.mapper.toDomain(<% name %>);
+  }
+
+  async search(limit?: number, skip?: number): Promise<<% nameUpper %>Principal[]> {
+    const r = await this.db.find(<% nameUpper %>Entity, {}, { limit, offset: skip });
+    return r.map(x => this.mapper.toPrincipal(x));
+  }
+
+  async update(id: string, <% name %>: <% nameUpper %>Record): Promise<<% nameUpper %>Principal> {
+    const v2 = this.mapper.fromRecord(<% name %>);
+    const v1 = this.db.getReference(<% nameUpper %>Entity, id);
+    Object.assign(v1, v2);
+    await this.db.flush();
+    return this.mapper.toPrincipal(v1);
+  }
+}

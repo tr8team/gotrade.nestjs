@@ -1,0 +1,75 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpException,
+  BadRequestException,
+  Inject,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { PinoLogger } from 'nestjs-pino';
+import { I<% nameUpper %>Service, <% nameUpper %>Service } from '../../../domain/<% name %>.service';
+import { <% nameUpper %>ApiV1Mapper } from './<% name %>.mapper';
+import { Create<% nameUpper %>Req, Search<% nameUpper %>Query } from './dto/<% name %>.req';
+import { <% nameUpper %>PrincipalRes, <% nameUpper %>Res } from './dto/<% name %>.res';
+import {
+  create<% nameUpper %>ReqSchema,
+  search<% nameUpper %>QuerySchema,
+  update<% nameUpper %>ReqSchema,
+} from './dto/<% name %>.zod';
+
+@Controller({ version: '<% version %>', path: '<% name %>'})
+export class <% nameUpper %>V<% version %>Controller {
+  constructor(
+    @Inject(<% nameUpper %>Service) private readonly service: I<% nameUpper %>Service,
+    @Inject(<% nameUpper %>ApiV1Mapper) private readonly mapper: <% nameUpper %>ApiV1Mapper,
+    @Inject(PinoLogger) private readonly logger: PinoLogger,
+  ) {}
+
+  @Get()
+  async search(
+    @Query() query: Search<% nameUpper %>Query,
+  ): Promise<<% nameUpper %>PrincipalRes[]> {
+    const result = search<% nameUpper %>QuerySchema.safeParse(query);
+    if (!result.success) throw new BadRequestException('Model Validation Failed', { cause: result.error });
+    const <% nameUpper %>s = await this.service.search(query.limit, query.skip);
+    return <% nameUpper %>s.map(x => this.mapper.toPrincipalRes(x));
+  }
+
+  @Get(':id')
+  async get(@Param('id') id: string): Promise<<% nameUpper %>Res> {
+    const <% nameUpper %> = await this.service.get(id);
+    if (<% nameUpper %> != null) return this.mapper.toRes(<% nameUpper %>);
+    throw new HttpException('<% nameUpper %> not found', 404);
+  }
+
+  @Post()
+  async create(@Body() req: Create<% nameUpper %>Req): Promise<<% nameUpper %>PrincipalRes> {
+    const result = create<% nameUpper %>ReqSchema.safeParse(req);
+    if (!result.success) throw new BadRequestException('Model Validation Failed', { cause: result.error });
+    const domain = this.mapper.fromCreateReq(req);
+    const <% nameUpper %> = await this.service.create(domain);
+    return this.mapper.toPrincipalRes(<% nameUpper %>);
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() req: Create<% nameUpper %>Req,
+  ): Promise<<% nameUpper %>PrincipalRes> {
+    const result = update<% nameUpper %>ReqSchema.safeParse(req);
+    if (!result.success) throw new BadRequestException('Model Validation Failed', { cause: result.error });
+    const domain = this.mapper.fromUpdateReq(req);
+    const <% nameUpper %> = await this.service.update(id, domain);
+    return this.mapper.toPrincipalRes(<% nameUpper %>);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<void> {
+    await this.service.delete(id);
+  }
+}

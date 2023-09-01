@@ -1,0 +1,92 @@
+import { describe, should as s } from 'vitest';
+import {
+  <% nameUpper %>,
+  <% nameUpper %>Principal,
+  <% nameUpper %>Record,
+} from '../../../src/sample/domain/models/person.model';
+import { <% nameUpper %>ApiV1Mapper } from '../../../src/sample/adapters/api/v1/person.mapper';
+import {
+  Create<% nameUpper %>Req,
+  Update<% nameUpper %>Req,
+} from '../../../src/sample/adapters/api/v1/dto/person.req';
+import {
+  <% nameUpper %>PrincipalRes,
+  <% nameUpper %>Res,
+} from '../../../src/sample/adapters/api/v1/dto/person.res';
+<% test.unit.api.imports %>
+
+s();
+
+describe('<% nameUpper %>ApiV1Mapper', () => {
+  const service = new <% nameUpper %>ApiV1Mapper();
+  describe('fromCreateReq', () => {
+    it('should convert CreateReq to domain', () => {
+      const subj: Create<% nameUpper %>Req = {
+<% test.unit.api.fromCreateReq.subj %>
+      };
+
+      const ex: <% nameUpper %>Record = {
+<% test.unit.api.fromCreateReq.ex %>
+      };
+
+      const act = service.fromCreateReq(subj);
+      act.should.deep.equal(ex);
+    });
+  });
+
+  describe('fromUpdateReq', () => {
+    it('should convert UpdateReq to domain', () => {
+      const subj: Update<% nameUpper %>Req = {
+<% test.unit.api.fromUpdateReq.subj %>
+      };
+
+      const ex: <% nameUpper %>Record = {
+<% test.unit.api.fromUpdateReq.ex %>
+      };
+
+      const act = service.fromUpdateReq(subj);
+      act.should.deep.equal(ex);
+    });
+  });
+
+  describe('toPrincipalRes', () => {
+    it('should convert domain to PrincipalRes', () => {
+      const subj: <% nameUpper %>Principal = {
+        id: '<% test.unit.api.toPrincipalRes.id %>',
+        record: {
+<% test.unit.api.toPrincipalRes.subj %>
+        },
+      };
+
+      const ex: <% nameUpper %>PrincipalRes = {
+        id: '<% test.unit.api.toPrincipalRes.id %>',
+<% test.unit.api.toPrincipalRes.ex %>
+      };
+      const act = service.toPrincipalRes(subj);
+      act.should.deep.equal(ex);
+    });
+  });
+
+  describe('toRes', () => {
+    it('should convert domain to PrincipalRes', () => {
+      const subj: <% nameUpper %> = {
+        principal: {
+          id: '<% test.unit.api.toRes.id %>',
+          record: {
+<% test.unit.api.toRes.subj %>
+          },
+        },
+      };
+
+      const ex: <% nameUpper %>Res = {
+        principal: {
+          id: '<% test.unit.api.toRes.id %>',
+<% test.unit.api.toRes.ex %>
+        },
+      };
+
+      const act = service.toRes(subj);
+      act.should.deep.equal(ex);
+    });
+  });
+});

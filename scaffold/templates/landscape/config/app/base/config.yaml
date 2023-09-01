@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=./schema.json
+$schema: ./schema.json
+mode: app
+host:
+  port: <% port.local %>
+  host: 0.0.0.0
+
+otel:
+  logging:
+    enableAutoAPILogging: false
+    level: info
+    prettify: true
+  metrics:
+    api:
+      enable: false
+      defaultAttributes: {}
+      ignoreRoutes: []
+      ignoreUndefinedRoutes: true
+    exporter:
+      interval: 1000
+      use: none
+    hostMetrics: false
+  trace:
+    exporter:
+      use: none
+app:
+  swagger:
+    title: <% landscape %> <% projectName %>
+    description: <% desc %>
+    version: '1.0'
+  landscape: local
+  platform: <% platform %>
+  service: <% service %>
+  designation: api
+
+databases: <% databases %>
+
+caches: <% caches %>
+
+storages: <% storages %>

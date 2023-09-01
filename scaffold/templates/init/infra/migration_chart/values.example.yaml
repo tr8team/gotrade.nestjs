@@ -1,0 +1,64 @@
+serviceTree:
+  landscape: develop
+  platform: <% platform %>
+  service: <% service %>
+  designation: migration
+  layer: "2"
+  team: <% team %>
+
+image:
+  repository: gotrade-nestjs-migration
+  pullPolicy: IfNotPresent
+  tag: ""
+
+envFromSecret: "secret"
+
+command: [ ]
+
+mountConfig: true
+
+config: { }
+
+imagePullSecrets: [ ]
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: { }
+  name: ""
+
+podAnnotations: { }
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  privileged: false
+  seccompProfile:
+    type: RuntimeDefault
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+
+resources:
+  limits:
+    cpu: 500
+    memory: 512Mi
+  requests:
+    cpu: 100
+    memory: 128Mi
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }

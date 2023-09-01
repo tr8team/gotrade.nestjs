@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "gotrade-nestjs-api.fullname" . }}-test-connection"
+  labels: {{- include "gotrade-nestjs-api.labels" . | nindent 4 }}
+  annotations: {{- include "gotrade-nestjs-api.annotations" . | nindent 4 }}
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "gotrade-nestjs-api.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

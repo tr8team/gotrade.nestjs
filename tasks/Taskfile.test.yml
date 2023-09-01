@@ -1,0 +1,67 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Run all unit tests
+    cmds:
+      - task: unit
+  watch:
+    desc: Run unit tests with auto-reload
+    cmds:
+      - task: unit:watch
+  report:
+    desc: Generate unit tests and integration tests reports
+    deps:
+      - unit:report
+      - int:report
+  # Unit Tests
+  unit:
+    desc: Run unit tests
+    cmds:
+      - vitest run --config ./config/test/vitest.unit.dev.config.ts {{.CLI_ARGS}}
+
+  unit:watch:
+    desc: Run unit tests with auto-reload
+    cmds:
+      - vitest watch --config ./config/test/vitest.unit.dev.config.ts {{.CLI_ARGS}}
+
+  unit:cover:
+    desc: Run unit test and generate coverage
+    cmds:
+      - vitest run --config ./config/test/vitest.unit.dev.config.ts --coverage {{.CLI_ARGS}}
+
+  unit:report:
+    desc: Generate report for unit tests
+    cmds:
+      - vitest run --config ./config/test/vitest.unit.report.config.ts --coverage {{.CLI_ARGS}}
+  #      - find test-results/unit/html \( ! -regex '.*/\..*' \) -type f -exec sed -i 's/__vitest__\///g' {} +
+
+  # Integration tests
+  int:
+    desc: Run integration tests
+    cmds:
+      - ./scripts/test.sh ./config/test.yaml vitest run --config ./config/test/vitest.int.dev.config.ts {{.CLI_ARGS}}
+
+  int:watch:
+    desc: Run integration tests with auto-reload
+    cmds:
+      - ./scripts/test.sh ./config/test.yaml vitest watch --config ./config/test/vitest.int.dev.config.ts {{.CLI_ARGS}}
+
+  int:cover:
+    desc: Run integration test and generate coverage
+    cmds:
+      - ./scripts/test.sh ./config/test.yaml vitest run --config ./config/test/vitest.int.dev.config.ts --coverage {{.CLI_ARGS}}
+
+  int:report:
+    desc: Generate report for integration tests
+    cmds:
+      - ./scripts/test.sh ./config/test.yaml vitest run --config ./config/test/vitest.int.report.config.ts --coverage {{.CLI_ARGS}}
+
+  # util
+  clean:
+    desc: Cleans up ephemeral test artifacts
+    ignore_error: true
+    cmds:
+      - rm -rf test-results
+      - rm -rf .nyc_output
+      - rm -rf coverage

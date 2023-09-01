@@ -1,0 +1,17 @@
+
+<% name %>:
+  connection:
+    port: 9000
+    useSSL: false
+    endpoint: <% platform %>-<% service %>-<% name %>-storage.<% platform %>.svc
+    access: admin
+    secret: supersecret
+    bucket: <% name %>
+  dev:
+    autoSeed: true
+    timeout: 120
+    autoMigrate: true
+  migration:
+    autoMigrate: false
+    timeout: 60
+    autoSeed: false

@@ -1,0 +1,75 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "<% platform %>-<% service %>-migration.fullname-with-suffix" (dict "arg" "migration" "root" .) }}
+  annotations: {{- include "<% platform %>-<% service %>-migration.annotations" . | nindent 4 }}
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-1"
+  labels: {{- include "<% platform %>-<% service %>-migration.labels" . | nindent 4 }}
+    tr8.io/type: job
+spec:
+  template:
+    metadata:
+      name: {{ include "<% platform %>-<% service %>-migration.fullname" . }}-migration
+      labels: {{- include "<% platform %>-<% service %>-migration.labels" . | nindent 8 }}
+        tr8.io/type: job
+      annotations: {{- include "<% platform %>-<% service %>-migration.annotations" . | nindent 8 }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          command:
+            {{- toYaml .Values.command | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: LANDSCAPE
+              value: {{ .Values.serviceTree.landscape }}
+          {{- if.Values.envFromSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.envFromSecret }}
+          {{- end }}
+    {{- if .Values.mountConfig }}
+          volumeMounts:
+            - mountPath: /app/dist/config/app/{{ .Values.serviceTree.landscape }}.config.yaml
+              name: config-volume
+              subPath: {{ .Values.serviceTree.landscape }}.config.yaml
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "<% platform %>-<% service %>-migration.fullname-with-suffix" (dict "arg" "config" "root" .) }}
+            items:
+              - key: {{ .Values.serviceTree.landscape }}.config.yaml
+                path: {{ .Values.serviceTree.landscape }}.config.yaml
+      {{- end }}
+      restartPolicy: Never
+
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "<% platform %>-<% service %>-migration.serviceAccountName" . }}
+  backoffLimit: 4

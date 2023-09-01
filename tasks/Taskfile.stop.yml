@@ -1,0 +1,16 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Stop all everything
+    cmds:
+      - task: stop:dev
+      - task: stop:test
+  stop:dev:
+    desc: Stop the development workflow
+    cmds:
+      - tilt down
+  stop:test:
+    desc: Stop the test workflow
+    cmds:
+      - tilt down -- --config config/test.yaml --action test

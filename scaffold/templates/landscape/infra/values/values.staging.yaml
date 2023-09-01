@@ -1,0 +1,189 @@
+landscape: &l <% landscape %>
+
+secret:
+  name: &secret "<% platform %>-<% service %>-secrets"
+  doppler:
+    name: <% platform %>-<% service %>-store
+    enable: true
+    target: "doppler-secret"
+    remoteRef: <% platform.toUpperCase() %>_<% service.toUpperCase() %>_DOPPLER_TOKEN
+    secretKey: <% platform.toUpperCase() %>_<% service.toUpperCase() %>_DOPPLER_TOKEN
+    secretStore:
+      name: doppler-store
+      kind: ClusterSecretStore
+    policy:
+      creation: Owner
+      deletion: Retain
+  fake:
+    enable: false
+
+migration:
+
+  # -- secret to mount as env to use for migration
+  envFromSecret: *secret
+
+  # -- enable migration job on production
+  enable: true
+  serviceTree:
+    # -- override the landscape
+    landscape: *l
+
+  # -- image to pull
+  image:
+    repository: harbor.admin.tr8.tech/<% team %>/tr8team/<% platform %>.<% service %>/migrate-arm
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  # -- command for migration
+  command: [ "node", "dist/src/migrate" ]
+
+  # -- whether to mount configmap
+  mountConfig: true
+
+  # -- overrides the config map
+  config:
+    mode: migration
+
+  # -- image pull secrets
+  imagePullSecrets:
+    - name: <% team %>-rbac-setup-docker-pull-secret-<% team %>
+
+  # -- whether to create service account or name of existing service account
+  serviceAccount:
+    create: false
+    name: ""
+
+  # -- maximum security for production use-case
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    privileged: false
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: false
+
+  # -- request and limits of migration
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # -- node selector, mainly for selecting ARM nodes in staging or production
+  nodeSelector:
+    kubernetes.io/arch: arm64
+
+api:
+  enable: true
+  # override the service tree to use the correct landscape
+  serviceTree:
+    landscape: *l
+
+  command:
+    - node
+    - dist/src/main
+
+  # -- secret to mount as env to use for api
+  envFromSecret: *secret
+
+  # -- number of replicas. Ignore if auto-scaling is enabled
+  replicaCount: 1
+
+  # -- request and limits of you application
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 2Gi
+
+  service:
+    # -- external port of your application
+    port: 80
+    # -- internal port of your application
+    containerPort: 3000
+
+  # -- whether to enable auto-scaling
+  autoscaling:
+    enabled: false
+
+  # -- image to pull
+  image:
+    repository: harbor.admin.tr8.tech/<% team %>/tr8team/<% platform %>.<% service %>/api-arm
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  # -- whether to create service account or name of existing service account
+  serviceAccount:
+    create: false
+    name: ""
+
+  # use ARM nodes for production
+  nodeSelector:
+    kubernetes.io/arch: arm64
+
+  # -- image pull secrets
+  imagePullSecrets:
+    - name: <% team %>-rbac-setup-docker-pull-secret-<% team %>
+
+  ingress:
+    enabled: true
+    className: "ambassador"
+    hosts:
+      # -- which host it should use
+      - host: api.<% service %>.<% platform %>.<% landscape %>.tr8.tech
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      # -- issuer certificate for the said ingress
+      - hosts:
+          - api.<% service %>.<% platform %>.<% landscape %>.tr8.tech
+        # -- custom secret name, use LPSD
+        secretName: <% landscape %>-<% platform %>-<% service %>-api
+        # -- Currently, should use ZeroSSL issuer to issue certificates
+        issuerRef: cluster-issuer-zero-issuer
+
+  # -- maximum security for production use-case
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    privileged: false
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+  # -- mount configmap as volume
+  mountConfig: true
+  # -- override any config you want here
+  config: { }
+
+# -- Integration test, should be disabled
+test:
+  # -- enable the test job
+  enable: false
+
+<% databases %>
+<% caches %>
+<% storages %>
+

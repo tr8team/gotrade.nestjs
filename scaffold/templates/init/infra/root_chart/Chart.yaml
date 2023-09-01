@@ -1,0 +1,44 @@
+apiVersion: v2
+name: <% platform %>-<% service %>-root
+description: <% desc %>
+
+type: application
+
+version: 0.1.0
+
+appVersion: "1.16.0"
+
+dependencies:
+  - name: <% platform %>-<% service %>-api
+    repository: file://../api_chart
+    version: 0.1.0
+    alias: api
+    condition: api.enable
+    tags:
+      - active
+  - name: <% platform %>-<% service %>-migration
+    repository: file://../migration_chart
+    version: 0.1.0
+    alias: migration
+    condition: migration.enable
+    tags:
+      - active
+  - name: <% platform %>-<% service %>-test
+    repository: file://../test_chart
+    version: 0.1.0
+    alias: test
+    condition: test.enable
+    tags:
+      - active
+
+#--scaffold cache start--
+
+#--scaffold cache end--
+
+#--scaffold storage start--
+
+#--scaffold storage end--
+
+#--scaffold database start--
+
+#--scaffold database end--

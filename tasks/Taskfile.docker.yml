@@ -1,0 +1,30 @@
+version: 3
+
+tasks:
+  default:
+    desc: Build all images
+    cmds:
+      - task: prod
+      - task: dev
+      - task: test
+      - task: migrate
+
+  prod:
+    desc: Build production image
+    cmds:
+      - docker build -t {{.IMAGE}}:{{.CLI_ARGS | default "latest" }} -f infra/Dockerfile .
+
+  dev:
+    desc: Build development image
+    cmds:
+      - docker build -t {{.IMAGE}}-dev:{{.CLI_ARGS | default "latest" }} -f infra/dev.Dockerfile .
+
+  test:
+    desc: Build integration test image
+    cmds:
+      - docker build -t {{.IMAGE}}-test:{{.CLI_ARGS | default "latest" }} -f infra/test.Dockerfile .
+
+  migrate:
+    desc: Build migration image
+    cmds:
+      - docker build -t {{.IMAGE}}-migration:{{.CLI_ARGS | default "latest" }} -f infra/migrate.Dockerfile .

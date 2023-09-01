@@ -1,0 +1,57 @@
+landscape: &l <% landscape %>
+
+secret:
+  name: &secret "<% platform %>-<% service %>-secrets"
+  doppler:
+    enable: false
+  fake:
+    enable: true
+    path: env/.env.<% landscape %>
+
+migration:
+  enable: false
+
+test:
+  enable: false
+
+api:
+  serviceTree:
+    landscape: *l
+
+  envFromSecret: *secret
+
+  replicaCount: 1
+
+  service:
+    port: 80
+    containerPort: 3000
+
+  image:
+    repository: <% platform %>-<% service %>-api
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    hosts:
+      - host: api.<% service %>.<% platform %>.<% landscape %>.lvh.me
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: [ ]
+
+  podSecurityContext: { }
+  securityContext: { }
+
+  livenessProbe:
+    initialDelaySeconds: 60
+  readinessProbe:
+    initialDelaySeconds: 60
+
+  mountConfig: false
+
+  config:
+    mode: app
+
+<% databases %>
+<% caches %>
+<% storages %>

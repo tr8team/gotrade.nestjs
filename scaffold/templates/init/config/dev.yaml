@@ -1,0 +1,22 @@
+# service tree labels
+landscape: local
+
+platform: <% platform %>
+service: <% service %>
+
+# tilt port
+port: <% port.dev %>
+
+# "local" or "cluster"
+type: cluster
+
+# fast mode
+# 1. does not start the cluster, automatically assumes that your cluster already created
+# 2. does not clean up resources. This makes your future starts faster
+fast: false
+
+# whether to start local cluster. If false, will connect to current context
+startCluster: true
+
+# only 2 available modes, dev (live reload), prod (production images)
+mode: dev

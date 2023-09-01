@@ -1,0 +1,23 @@
+import { IsOptional, Max, Min } from 'class-validator';
+
+class Create<% nameUpper %>Req {
+<% src.api.model %>
+}
+
+class Update<% nameUpper %>Req {
+<% src.api.model %>
+}
+
+class Search<% nameUpper %>Query {
+
+  @IsOptional()
+  @Max(100)
+  @Min(1)
+  limit?: number;
+
+  @IsOptional()
+  @Min(0)
+  skip?: number;
+}
+
+export { Create<% nameUpper %>Req, Update<% nameUpper %>Req, Search<% nameUpper %>Query };

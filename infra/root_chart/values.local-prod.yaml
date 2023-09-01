@@ -1,0 +1,145 @@
+landscape: &l local-prod
+
+secret:
+  name: &secret "gotrade-nestjs-secrets"
+  doppler:
+    enable: false
+  fake:
+    enable: true
+    path: env/.env.local-prod
+
+migration:
+  serviceTree:
+    landscape: *l
+
+  envFromSecret: *secret
+
+  image:
+    repository: gotrade-nestjs-migration
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  command: ["node", "dist/src/migrate"]
+
+  mountConfig: true
+
+  config:
+    mode: migration
+
+  imagePullSecrets: []
+
+  serviceAccount:
+    create: false
+    name: ""
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    privileged: false
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: false
+
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+  nodeSelector:
+    kubernetes.io/arch: arm64
+
+test:
+  enable: false
+
+api:
+
+  envFromSecret: *secret
+
+  serviceTree:
+    landscape: *l
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+  service:
+    port: 80
+    containerPort: 3000
+
+  autoscaling:
+    enabled: true
+    maxReplicas: 5
+    minReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  image:
+    repository: gotrade-nestjs-api
+    pullPolicy: IfNotPresent
+    tag: ""
+  serviceAccount:
+    create: false
+    name: ""
+
+  nodeSelector:
+    kubernetes.io/arch: arm64
+
+  imagePullSecrets: []
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    hosts:
+      - host: api.nestjs.gotrade.local-prod.lvh.me
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: [ ]
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    privileged: false
+    seccompProfile:
+      type: RuntimeDefault
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+  mountConfig: true
+  config:
+    mode: app
+
+maincache:
+  enable: true
+
+maindb:
+  enable: true
+
+commentdb:
+  enable: true
+
+mainstorage:
+  enable: true

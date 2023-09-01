@@ -1,0 +1,8 @@
+
+<% name %>:
+  dev:
+    autoMigrate: false
+    autoSeed: false
+  migration:
+    migrate: true
+    seed: true

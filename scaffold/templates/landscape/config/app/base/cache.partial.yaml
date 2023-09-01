@@ -1,0 +1,17 @@
+
+<% name %>:
+  migration:
+    autoSeed: false
+  dev:
+    autoSeed: false
+  connection:
+    port: 6379
+    host: <% platform %>-<% service %>-<% name %>-cache.<% platform %>.svc
+    password: supersecret
+    autoResubscribe: true
+    commandTimeout: 2000 # 2 seconds
+    connectTimeout: 120000 # 120 seconds
+    enableAutoPipelining: true
+    keyPrefix: <% name %>
+    tls: false
+    readOnly: false

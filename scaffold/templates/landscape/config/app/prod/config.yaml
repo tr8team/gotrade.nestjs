@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=./schema.json
+$schema: ./schema.json
+mode: app
+host:
+  port: 3000
+  host: '::'
+otel:
+  logging:
+    enableAutoAPILogging: true
+    level: info
+    prettify: false
+  metrics:
+    api:
+      enable: true
+      defaultAttributes: {}
+      ignoreRoutes: []
+      ignoreUndefinedRoutes: false
+    exporter:
+      interval: 1000
+      use: otlp
+      otlp:
+        compression: gzip
+        url: http://otel-otlp-collector.otel.svc:4318
+        timeout: 30000
+    hostMetrics: false
+  trace:
+    exporter:
+      use: otlp
+      otlp:
+        compression: gzip
+        url: http://otel-otlp-collector.otel.svc:4318
+        timeout: 30000
+app:
+  landscape: <% landscape %>
+  swagger:
+    title: <% landscape %> <% projectName %>
+
+databases: <% databases %>
+
+caches: <% caches %>
+
+storages: <% storages %>
+

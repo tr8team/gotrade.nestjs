@@ -1,0 +1,97 @@
+replicaCount: 1
+
+serviceTree:
+  landscape: develop
+  platform: gotrade
+  service: nestjs
+  designation: api
+  layer: "2"
+  team: PBG
+
+image:
+  repository: gotrade-nestjs
+  pullPolicy: IfNotPresent
+  tag: ""
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+
+mountConfig: true
+
+config: {}
+
+imagePullSecrets: [ ]
+
+nameOverride: ""
+fullnameOverride: ""
+
+envFromSecret: ""
+
+serviceAccount:
+  create: false
+  annotations: { }
+  name: ""
+
+podAnnotations: { }
+
+podSecurityContext: { }
+#  runAsNonRoot: true
+#  runAsUser: 10001
+#  runAsGroup: 10001
+
+securityContext:
+#  runAsNonRoot: true
+#  runAsUser: 10001
+#  runAsGroup: 10001
+#  privileged: false
+#  seccompProfile:
+#    type: RuntimeDefault
+#  allowPrivilegeEscalation: false
+#  capabilities:
+#    drop:
+#      - ALL
+#  readOnlyRootFilesystem: false
+
+service:
+  type: ClusterIP
+  port: 80
+  containerPort: 3000
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations: { }
+  hosts:
+    - host: api.express-starter.127-0-0-1.nip.io
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: [ ]
+
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 70
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }

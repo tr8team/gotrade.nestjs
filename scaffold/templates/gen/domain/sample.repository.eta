@@ -1,0 +1,15 @@
+import { <% nameUpper %>, <% nameUpper %>Principal, <% nameUpper %>Record } from './models/<% name %>.model';
+
+interface I<% nameUpper %>Repository {
+  search(limit?: number, skip?: number): Promise<<% nameUpper %>Principal[]>;
+
+  get(id: string): Promise<<% nameUpper %> | null>;
+
+  create(<% name %>: <% nameUpper %>Record): Promise<<% nameUpper %>Principal>;
+
+  update(id: string, blog: <% nameUpper %>Record): Promise<<% nameUpper %>Principal>;
+
+  delete(id: string): Promise<void>;
+}
+
+export type { I<% nameUpper %>Repository };

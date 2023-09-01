@@ -1,0 +1,61 @@
+apiVersion: v2
+name: gotrade-nestjs-root
+description: A Helm chart for Kubernetes
+
+type: application
+
+version: 0.1.0
+
+appVersion: "1.16.0"
+
+dependencies:
+  - name: gotrade-nestjs-api
+    repository: file://../api_chart
+    version: 0.1.0
+    alias: api
+    condition: api.enable
+    tags:
+      - active
+  - name: gotrade-nestjs-migration
+    repository: file://../migration_chart
+    version: 0.1.0
+    alias: migration
+    condition: migration.enable
+    tags:
+      - active
+  - name: gotrade-nestjs-test
+    repository: file://../test_chart
+    version: 0.1.0
+    alias: test
+    condition: test.enable
+    tags:
+      - active
+
+#--scaffold cache start--
+  - name: dragonfly
+    repository: oci://ghcr.io/dragonflydb/dragonfly/helm
+    version: v1.8.0
+    alias: maincache
+    condition: maincache.enable
+#--scaffold cache end--
+
+#--scaffold storage start--
+  - name: minio
+    version: 12.7.0
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: mainstorage
+    condition: mainstorage.enable
+#--scaffold storage end--
+
+#--scaffold database start--
+  - name: postgresql
+    version: 12.5.5
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: maindb
+    condition: maindb.enable
+  - name: mysql
+    version: 9.10.10
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: commentdb
+    condition: commentdb.enable
+#--scaffold database end--

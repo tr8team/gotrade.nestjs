@@ -1,0 +1,6 @@
+
+<% name %>:
+  dev:
+    autoSeed: true
+    autoMigrate: true
+    timeout: 120

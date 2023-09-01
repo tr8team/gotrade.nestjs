@@ -1,0 +1,21 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Tears all clusters
+    cmds:
+      - task: dev
+      - task: test
+      - task: ci
+  dev:
+    desc: Tears the development cluster
+    cmds:
+      - ./scripts/delete-k3d-cluster.sh
+  test:
+    desc: Tears the testing cluster
+    cmds:
+      - ./scripts/delete-k3d-cluster.sh ./config/test.yaml
+  ci:
+    desc: Tears the ci cluster
+    cmds:
+      - ./scripts/delete-k3d-cluster.sh ./config/ci.yaml

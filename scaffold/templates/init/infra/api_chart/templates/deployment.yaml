@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "<% platform %>-<% service %>-api.fullname" . }}
+  labels: {{- include "<% platform %>-<% service %>-api.labels" . | nindent 4 }}
+  annotations: {{- include "<% platform %>-<% service %>-api.annotations" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "<% platform %>-<% service %>-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations: {{- include "<% platform %>-<% service %>-api.annotations" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels: {{- include "<% platform %>-<% service %>-api.selectorLabels" . | nindent 8 }}
+        {{ include "<% platform %>-<% service %>-api.labels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "<% platform %>-<% service %>-api.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.command }}
+          command: {{- toYaml . | nindent 12}}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+          livenessProbe: {{ toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe: {{ toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.envFromSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.envFromSecret }}
+          {{- end }}
+          env:
+            - name: LANDSCAPE
+              value: {{ .Values.serviceTree.landscape }}
+      {{- if .Values.mountConfig }}
+          volumeMounts:
+            - mountPath: /app/dist/config/app/{{ .Values.serviceTree.landscape }}.config.yaml
+              name: config-volume
+              readOnly: true
+              subPath: {{ .Values.serviceTree.landscape }}.config.yaml
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "<% platform %>-<% service %>-api.fullname-with-suffix" (dict "arg" "config" "root" .) }}
+            items:
+              - key: {{ .Values.serviceTree.landscape }}.config.yaml
+                path: {{ .Values.serviceTree.landscape }}.config.yaml
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

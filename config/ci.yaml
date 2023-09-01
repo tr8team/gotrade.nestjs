@@ -1,0 +1,6 @@
+# service tree labels
+landscape: ci
+platform: gotrade
+service: nestjs
+
+type: cluster

@@ -1,0 +1,237 @@
+serviceTree: &serviceTree
+  landscape: develop
+  platform: <% platform %>
+  service: <% service %>
+  layer: "2"
+  team: <% team %>
+
+secret:
+  name: &secret "<% platform %>-<% service %>-secrets"
+  doppler:
+
+    # -- whether to use doppler store for secret
+    enable: false
+#    name: <% platform %>-<% service %>-store
+#    target: "doppler-secret"
+#    remoteRef: <% platform.toUpperCase() %>_<% service.toUpperCase() %>_DOPPLER_TOKEN
+#    secretKey: <% platform.toUpperCase() %>_<% service.toUpperCase() %>_DOPPLER_TOKEN
+#    secretStore:
+#      name: doppler-store
+#      kind: ClusterSecretStore
+#    policy:
+#      creation: Owner
+#      deletion: Retain
+  fake:
+    enable: false
+
+migration:
+
+  serviceTree:
+    <<: *serviceTree
+    designation: migration
+
+  envFromSecret: *secret
+
+  image:
+    repository: <% platform %>-<% service %>-migration
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  command: [ "node", "dist/src/migrate" ]
+
+  mountConfig: true
+
+  config:
+    mode: migration
+
+  imagePullSecrets: [ ]
+
+  serviceAccount:
+    create: false
+    annotations: { }
+    name: ""
+
+  podAnnotations: { }
+
+  podSecurityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+
+  securityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+  #  privileged: false
+  #  seccompProfile:
+  #    type: RuntimeDefault
+  #  allowPrivilegeEscalation: false
+  #  capabilities:
+  #    drop:
+  #      - ALL
+  #  readOnlyRootFilesystem: false
+
+
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
+
+  nodeSelector: { }
+
+  tolerations: [ ]
+
+  affinity: { }
+
+api:
+  envFromSecret: *secret
+  affinity: { }
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 1
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  tolerations: [ ]
+  serviceTree:
+    <<: *serviceTree
+    designation: api
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 5
+
+  service:
+    port: 80
+    containerPort: 3000
+    type: ClusterIP
+  autoscaling:
+    enabled: false
+    maxReplicas: 100
+    minReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+  image:
+    repository: <% platform %>-<% service %>-api
+    pullPolicy: IfNotPresent
+    tag: ""
+  serviceAccount:
+    create: false
+    annotations: { }
+    name: ""
+  podAnnotations: { }
+  nodeSelector: { }
+  imagePullSecrets:
+    - name: regcred
+  ingress:
+    enabled: true
+    className: "traefik"
+    annotations: { }
+    hosts:
+      - host: api.<% service %>.<% platform %>.local.lvh.me
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - api.<% service %>.<% platform %>.local.lvh.me
+        secretName: host
+        issuerRef: sample
+  podSecurityContext: { }
+
+  securityContext: { }
+
+  mountConfig: false
+  # override any config you want here
+  config:
+    mode: app
+
+test:
+  envFromSecret: *secret
+  serviceTree:
+    <<: *serviceTree
+    designation: test
+
+  mode: pod
+
+  volume:
+    enable: false
+
+  image:
+    repository: <% platform %>-<% service %>-test
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  command: [ "vitest", "run", "--config", "./config/test/vitest.int.report.config.ts" ]
+
+  mountConfig: true
+
+  config:
+    mode: app
+
+  imagePullSecrets: [ ]
+
+  serviceAccount:
+    create: false
+    annotations: { }
+    name: ""
+
+  podAnnotations: { }
+
+  podSecurityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+
+  securityContext: { }
+  #  runAsNonRoot: true
+  #  runAsUser: 10001
+  #  runAsGroup: 10001
+  #  privileged: false
+  #  seccompProfile:
+  #    type: RuntimeDefault
+  #  allowPrivilegeEscalation: false
+  #  capabilities:
+  #    drop:
+  #      - ALL
+  #  readOnlyRootFilesystem: false
+
+
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  nodeSelector: { }
+
+  tolerations: [ ]
+
+  affinity: { }
+
+#--scaffold database start--
+#--scaffold database end--
+
+#--scaffold cache start--
+#--scaffold cache end--
+
+#--scaffold storage start--
+#--scaffold storage end--
+
+tags:
+  active: true

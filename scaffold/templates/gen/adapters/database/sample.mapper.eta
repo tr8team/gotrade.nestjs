@@ -1,0 +1,38 @@
+import { Injectable } from '@nestjs/common';
+import {
+  <% nameUpper %>,
+  <% nameUpper %>Principal,
+  <% nameUpper %>Record,
+} from '../../domain/models/<% name %>.model';
+import { <% nameUpper %>Entity } from './entities/main/<% name %>.entity';
+<% src.data.mapper.imports %>
+
+
+@Injectable()
+export class <% nameUpper %>DataMapper {
+  fromRecord(domain: <% nameUpper %>Record): <% nameUpper %>Entity {
+    const entity = new <% nameUpper %>Entity();
+<% src.data.mapper.from %>
+    return entity;
+  }
+
+  fromPrincipal(domain: <% nameUpper %>Principal): <% nameUpper %>Entity {
+    const entity = this.fromRecord(domain.record);
+    entity.id = domain.id;
+    return entity;
+  }
+
+  toRecord(data: <% nameUpper %>Entity): <% nameUpper %>Record {
+    return new <% nameUpper %>Record(
+<% src.data.mapper.to %>
+    );
+  }
+
+  toPrincipal(data: <% nameUpper %>Entity): <% nameUpper %>Principal {
+    return new <% nameUpper %>Principal(data.id, this.toRecord(data));
+  }
+
+  toDomain(data: <% nameUpper %>Entity): <% nameUpper %> {
+    return new <% nameUpper %>(this.toPrincipal(data));
+  }
+}

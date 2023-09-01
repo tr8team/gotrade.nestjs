@@ -1,0 +1,16 @@
+version: '3'
+
+tasks:
+  run:
+    desc: Run configs
+    internal: true
+    env:
+      LANDSCAPE: '{{.LANDSCAPE}}'
+    cmds:
+      - doppler run -p "$PLATFORM-$SERVICE" -c "{{.LANDSCAPE}}" -- nest start {{.CLI_ARGS}}
+  staging:
+    desc: Run with Staging Config
+    cmds:
+      - task: run
+        vars:
+          LANDSCAPE: staging

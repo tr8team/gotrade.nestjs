@@ -1,0 +1,38 @@
+import { Injectable } from '@nestjs/common';
+import { Create<% nameUpper %>Req, Update<% nameUpper %>Req } from './dto/<% name %>.req';
+import {
+  <% nameUpper %>,
+  <% nameUpper %>Principal,
+  <% nameUpper %>Record,
+} from '../../../domain/models/<% name %>.model';
+import { <% nameUpper %>PrincipalRes, <% nameUpper %>Res } from './dto/<% name %>.res';
+<% src.api.mapper.imports %>
+
+
+@Injectable()
+export class <% nameUpper %>ApiV1Mapper {
+  fromCreateReq(req: Create<% nameUpper %>Req): <% nameUpper %>Record {
+    return {
+<% src.api.mapper.fromReq %>
+    };
+  }
+
+  fromUpdateReq(req: Update<% nameUpper %>Req): <% nameUpper %>Record {
+    return {
+<% src.api.mapper.fromReq %>
+    };
+  }
+
+  toPrincipalRes(domain: <% nameUpper %>Principal): <% nameUpper %>PrincipalRes {
+    return {
+      id: domain.id,
+<% src.api.mapper.toRes %>
+    };
+  }
+
+  toRes(domain: <% nameUpper %>): <% nameUpper %>Res {
+    return {
+      principal: this.toPrincipalRes(domain.principal),
+    };
+  }
+}

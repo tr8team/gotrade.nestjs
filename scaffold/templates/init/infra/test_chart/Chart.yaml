@@ -1,0 +1,10 @@
+apiVersion: v2
+name: <% platform %>-<% service %>-test
+description: Helm chart for running integration test
+
+type: application
+
+version: 0.1.0
+
+appVersion: "1.16.0"
+

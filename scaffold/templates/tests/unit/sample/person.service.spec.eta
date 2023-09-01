@@ -1,0 +1,154 @@
+import { describe, expect, should as s } from 'vitest';
+import { anything, instance, mock, when } from 'ts-mockito';
+import {
+  <% nameUpper %>,
+  <% nameUpper %>Principal,
+  <% nameUpper %>Record,
+} from '../../../src/sample/domain/models/<% name %>.model';
+import { I<% nameUpper %>Repository } from '../../../src/sample/domain/<% name %>.repository';
+import { <% nameUpper %>Service } from '../../../src/sample/domain/<% name %>.service';
+<% test.unit.service.imports %>
+
+const should = s();
+// s();
+
+type <% nameUpper %>MockParams = {
+  search?: <% nameUpper %>Principal[];
+  get?: <% nameUpper %> | null;
+  create?: <% nameUpper %>Principal;
+  update?: <% nameUpper %>Principal;
+};
+
+const buildMock = (params: <% nameUpper %>MockParams): I<% nameUpper %>Repository => {
+  const blogMock = mock<I<% nameUpper %>Repository>();
+  if (params.search)
+    when(blogMock.search(anything(), anything())).thenResolve(params.search);
+  if (params.get) when(blogMock.get(anything())).thenResolve(params.get);
+  if (params.create)
+    when(blogMock.create(anything())).thenResolve(params.create);
+  if (params.update)
+    when(blogMock.update(anything(), anything())).thenResolve(params.update);
+  return instance(blogMock);
+};
+
+describe('I<% nameUpper %>Service', () => {
+  describe('search', () => {
+    it('should return a list of <% name %>', async () => {
+      const repo = buildMock({
+        search: [
+<% test.unit.service.search %>
+        ],
+      });
+      const subj = new <% nameUpper %>Service(repo);
+      const ex = [
+<% test.unit.service.search %>
+      ];
+
+      const actual = await subj.search();
+
+      actual.should.deep.equal(ex);
+    });
+  });
+
+  describe('get', () => {
+    describe('exist', () => {
+      it('should return the blog with the id', async () => {
+        const repo = buildMock({
+          get: {
+<% test.unit.service.get.model %>
+          },
+        });
+        const subj = new <% nameUpper %>Service(repo);
+        const ex: <% nameUpper %> = {
+<% test.unit.service.get.model %>
+        };
+
+        const act = await subj.get('<% test.unit.service.get.id %>');
+        should.exist(act);
+        act!.should.deep.equal(ex);
+      });
+    });
+
+    describe('not exist', () => {
+      it('should return null', async () => {
+        const repo = buildMock({});
+        const subj = new <% nameUpper %>Service(repo);
+        const act = await subj.get('<% test.unit.service.get.id2 %>');
+        should.not.exist(act);
+      });
+    });
+  });
+
+  describe('create', () => {
+    it('should create a new <% name %>', async () => {
+      const repo = buildMock({
+        create: {
+          record: {
+<% test.unit.service.create.model %>
+          },
+          id: '<% test.unit.service.create.id %>',
+        },
+      });
+      const service = new <% nameUpper %>Service(repo);
+      const subj: <% nameUpper %>Record = {
+<% test.unit.service.create.model %>
+      };
+
+      const ex: <% nameUpper %>Principal = {
+        record: {
+<% test.unit.service.create.model %>
+        },
+        id: '<% test.unit.service.create.id %>',
+      };
+
+      const act = await service.create(subj);
+
+      should.exist(act);
+      act!.should.deep.equal(ex);
+    });
+  });
+
+  describe('update', () => {
+    it('should create an existing <% name %>', async () => {
+      const repo = buildMock({
+        update: {
+          record: {
+<% test.unit.service.update.model %>
+          },
+          id: '<% test.unit.service.update.id %>',
+        },
+      });
+      const service = new <% nameUpper %>Service(repo);
+      const subj: <% nameUpper %>Record = {
+<% test.unit.service.update.model %>
+      };
+
+      const ex: <% nameUpper %>Principal = {
+        record: {
+<% test.unit.service.update.model %>
+        },
+        id: '<% test.unit.service.update.id %>',
+      };
+
+      const act = await service.update(
+        '<% test.unit.service.update.id %>',
+        subj,
+      );
+
+      should.exist(act);
+      act!.should.deep.equal(ex);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete an existing <% name %>', async () => {
+      const repo = buildMock({});
+      const service = new <% nameUpper %>Service(repo);
+
+      const act = async () =>
+        await service.delete('<% test.unit.service.delete %>');
+
+      expect(act).to.not.throw('Does not exist');
+    });
+  });
+});

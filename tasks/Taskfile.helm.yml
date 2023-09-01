@@ -1,0 +1,35 @@
+version: 3
+
+tasks:
+  sync:
+    desc: Sync configuration
+    cmds:
+      - ./scripts/config-sync.sh
+  dep:
+    desc: Install dependencies
+    cmds:
+      - helm dependency update ./infra/root_chart
+  remove:
+    desc: Removes the chart
+    cmds:
+      - helm uninstall {{.RELEASE}}
+  install:
+    desc: Installs the chart
+    deps:
+      - sync
+      - dep
+    cmds:
+      - >-
+        helm upgrade --install  {{.RELEASE}} ./infra/root_chart
+        --values ./infra/root_chart/values.yaml
+        --values ./infra/root_chart/values{{.LANDSCAPE}}.yaml
+  debug:
+    desc: Debugs the chart
+    deps:
+      - sync
+      - dep
+    cmds:
+      - >-
+        helm template --debug {{.RELEASE}} ./infra/root_chart
+        --values ./infra/root_chart/values.yaml
+        --values ./infra/root_chart/values{{.LANDSCAPE}}.yaml

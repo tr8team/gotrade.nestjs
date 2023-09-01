@@ -1,0 +1,21 @@
+# service tree labels
+landscape: local
+platform: gotrade
+service: nestjs
+
+# tilt port
+port: 11000
+
+# "local" or "cluster"
+type: local
+
+# fast mode
+# 1. does not start the cluster, automatically assumes that your cluster already created
+# 2. does not clean up resources. This makes your future starts faster
+fast: false
+
+# whether to start local cluster. If false, will connect to current context
+startCluster: true
+
+# only 2 available modes, dev (live reload), prod (production images)
+mode: dev

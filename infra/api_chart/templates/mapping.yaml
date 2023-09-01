@@ -1,0 +1,45 @@
+{{- if and .Values.ingress.enabled (eq .Values.ingress.className "ambassador") -}}
+{{- $fullName := include "gotrade-nestjs-api.fullname" . -}}
+{{- range $i, $v := .Values.ingress.hosts }}
+{{- range $j, $p := $v.paths }}
+{{- $idx := printf "i%s-p%s" (printf "%d" $i) (printf "%d" $j) }}
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: {{ include "gotrade-nestjs-api.fullname-with-suffix" (dict "arg" $idx "root" $) }}
+  labels: {{- include "gotrade-nestjs-api.labels" $ | nindent 4 }}
+  annotations: {{- include "gotrade-nestjs-api.annotations" $ | nindent 4 }}
+    link.argocd.argoproj.io/external-link: https://{{ $v.host }}{{ $p.path }}
+  {{- with $.Values.ingress.annotations }}
+    {{- toYaml $ | nindent 4 }}
+  {{- end }}
+spec:
+  hostname: {{ $v.host }}
+  prefix: {{ $p.path }}
+  service: {{ $fullName }}:{{ $.Values.service.port }}
+  {{- with $p.timeout }}
+  timeout_ms: {{ . }}
+  {{- end }}
+  allow_upgrade:
+    - websocket
+---
+{{- end -}}
+{{- end -}}
+---
+{{- range $i, $v := .Values.ingress.tls }}
+{{- range $j, $h := $v.hosts }}
+{{- $idx := printf "t%s-h%s" (printf "%d" $i) (printf "%d" $j) }}
+apiVersion: getambassador.io/v3alpha1
+kind: Host
+metadata:
+  name: {{ include "gotrade-nestjs-api.fullname-with-suffix" (dict "arg" $idx "root" $) }}
+  labels: {{- include "gotrade-nestjs-api.labels" $ | nindent 4 }}
+  annotations: {{- include "gotrade-nestjs-api.annotations" $ | nindent 4 }}
+spec:
+  hostname: {{ $h }}
+  tlsSecret:
+    name: {{ include "gotrade-nestjs-api.fullname-with-suffix" (dict "arg" $v.secretName "root" $) }}
+---
+{{- end -}}
+{{- end -}}
+{{- end -}}

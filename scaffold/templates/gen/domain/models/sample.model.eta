@@ -1,0 +1,20 @@
+<% src.domain.imports %>
+
+class <% nameUpper %> {
+  constructor(readonly principal: <% nameUpper %>Principal) {}
+}
+
+class <% nameUpper %>Principal {
+  constructor(
+    readonly id: string,
+    readonly record: <% nameUpper %>Record,
+  ) {}
+}
+
+class <% nameUpper %>Record {
+  constructor(
+<% src.domain.model %>
+  ) {}
+}
+
+export { <% nameUpper %>, <% nameUpper %>Principal, <% nameUpper %>Record };

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=./schema.json
+$schema: ./schema.json
+app:
+  swagger:
+    title: <% landscape %> <% projectName %>
+  landscape: <% landscape %>
+
+databases: <% databases %>
+
+caches: <% caches %>
+
+storages: <% storages %>
+

@@ -1,0 +1,18 @@
+{{-  range $k, $v := .Values.ingress.tls -}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "gotrade-nestjs-api.fullname-with-suffix" (dict "arg" $v.secretName "root" $) }}
+  labels: {{- include "gotrade-nestjs-api.labels" $ | nindent 4 }}
+  annotations: {{- include "gotrade-nestjs-api.annotations" $ | nindent 4 }}
+spec:
+  secretName: {{ include "gotrade-nestjs-api.fullname-with-suffix" (dict "arg" $v.secretName "root" $) }}
+  issuerRef:
+    name: {{ $v.issuerRef }}
+    kind: ClusterIssuer
+  dnsNames:
+    {{- range $hk, $hv := $v.hosts }}
+    - {{ $hv }}
+    {{- end }}
+---
+{{- end -}}

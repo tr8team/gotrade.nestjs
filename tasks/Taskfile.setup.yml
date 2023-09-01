@@ -1,0 +1,18 @@
+version: '3'
+
+tasks:
+  default:
+    desc: Build all images
+    cmds:
+      - task: node
+      - task: secrets
+  node:
+    desc: Install pnpm packages
+    cmds:
+      - pnpm i
+
+  secrets:
+    desc: Initialize secrets for development
+    interactive: true
+    cmds:
+      - ./scripts/local/setup_secrets.sh

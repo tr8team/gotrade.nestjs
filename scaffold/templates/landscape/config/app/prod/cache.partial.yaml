@@ -1,0 +1,8 @@
+
+<% name %>:
+  dev:
+    autoSeed: false
+  migration:
+    autoSeed: <% auto %>
+  connection:
+    tls: true

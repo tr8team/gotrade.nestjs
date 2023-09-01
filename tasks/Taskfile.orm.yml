@@ -1,0 +1,72 @@
+version: 3
+
+env:
+  GT_DATABASE: '{{.GT_DATABASE}}'
+  MIKRO_ORM_CLI_USE_TS_NODE: 'true'
+
+tasks:
+  default:
+    desc: Run MikroORM CLI
+    cmds:
+      - echo $LANDSCAPE $PLATFORM $SERVICE
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm {{.CLI_ARGS}}
+  debug:
+    desc: Debug MikroORM configuratiton
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm debug {{.CLI_ARGS}}
+  cache:clear:
+    desc: Clear metadata cache
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm cache:clear {{.CLI_ARGS}}
+  cache:generate:
+    desc: Generate metadata cache for production
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm cache:generate {{.CLI_ARGS}}
+  generate-entities:
+    desc: Generate entities based on current database
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm generate-entities {{.CLI_ARGS}}
+  database:import:
+    desc: Imports the SQL file to the database
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm database:import {{.CLI_ARGS}}
+  schema:create:
+    desc: Create database schema based on current metadata
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm schema:create {{.CLI_ARGS}}
+  schema:drop:
+    desc: Drop database schema based on current metadata
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm schema:drop {{.CLI_ARGS}}
+  schema:update:
+    desc: Update database schema based on current metadata
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm schema:update {{.CLI_ARGS}}
+  migration:create:
+    desc: Create new migration with current schema diff
+    cmds:
+      - mikro-orm migration:create {{.CLI_ARGS}}
+  migration:up:
+    desc: Migrate up to the latest version
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm migration:up {{.CLI_ARGS}}
+  migration:down:
+    desc: Migrate one step down
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm migration:down {{.CLI_ARGS}}
+  migration:list:
+    desc: List all executed migrations
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm migration:list {{.CLI_ARGS}}
+  migration:pending:
+    desc: List all pending migrations
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm migration:pending {{.CLI_ARGS}}
+  seeder:create:
+    desc: Creates a Create a new seeder class
+    cmds:
+      - mikro-orm seeder:create {{.CLI_ARGS}}
+  seeder:run:
+    desc: Seed the database using the seeder class
+    cmds:
+      - mirrord exec --context "k3d-$LANDSCAPE" -t "pod/$PLATFORM-$SERVICE-dev-proxy" --fs-mode local -e -n "$PLATFORM" -- mikro-orm seeder:run {{.CLI_ARGS}}

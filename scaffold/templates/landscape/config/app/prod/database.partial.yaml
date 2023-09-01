@@ -1,0 +1,10 @@
+
+<% name %>:
+  dev:
+    autoMigrate: false
+    autoSeed: false
+  migration:
+    migrate: <% auto %>
+    seed: <% auto %>
+    timeout: 30
+<% driver %>

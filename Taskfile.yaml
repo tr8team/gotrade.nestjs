@@ -1,0 +1,66 @@
+version: '3'
+env:
+  NODE_CONFIG_DIR: 'config'
+  MIKRO_ORM_CLI: ./config/mikro-orm.config.ts
+  IMAGE: gotrade-nestjs
+  RELEASE: nestjs
+  PLATFORM: gotrade
+  SERVICE: nestjs
+  LANDSCAPE: local
+
+includes:
+  test: tasks/Taskfile.test.yml
+  setup: tasks/Taskfile.setup.yml
+  docker: tasks/Taskfile.docker.yml
+  tear: tasks/Taskfile.tear.yml
+  stop: tasks/Taskfile.stop.yml
+  run: tasks/Taskfile.run.yml
+  preview: tasks/Taskfile.preview.yml
+
+  helm: Taskfile.helm.yml
+  orm: Taskfile.orm.yml
+
+tasks:
+  dev:
+    desc: Start development workflow
+    cmds:
+      - ./scripts/dev.sh ./config/dev.yaml nest start --watch
+
+  init:
+    desc: Initialize the project
+    interactive: true
+    cmds:
+      - ts-node ./scaffold/init.ts
+
+  # typescript related commands
+  build:
+    desc: Build the project
+    cmds:
+      - nest build
+  preview:
+    desc: Preview built project
+    deps:
+      - build
+    cmds:
+      - node dist/src/main
+  clean:
+    desc: Clean Artifacts
+    cmds:
+      - task: build:clean
+      - task: test:clean
+
+  # Quality Assurance
+  check:
+    desc: Run pre-commit
+    cmds:
+      - pre-commit run --all
+
+  gen:
+    desc: Generate
+    cmds:
+      - ts-node ./scaffold/generator.ts {{.CLI_ARGS}}
+
+  generate:config:schema:
+    desc: Generates configuration schema for better IDE completions
+    cmds:
+      - typescript-json-schema ./src/config/root.config.ts RootConfig -o config/app/schema.json

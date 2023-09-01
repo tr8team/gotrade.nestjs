@@ -1,0 +1,13 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: ci
+servers: 1
+agents: 0
+network: ci
+image: rancher/k3s:v1.25.12-k3s1
+registries:
+  create:
+    name: ci.registry.lvh.me
+    host: "0.0.0.0"
+    hostPort: "10020"

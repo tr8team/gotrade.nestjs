@@ -1,0 +1,45 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { <% nameUpper %>, <% nameUpper %>Principal, <% nameUpper %>Record } from './models/<% name %>.model';
+import { I<% nameUpper %>Repository } from './<% name %>.repository';
+import { <% nameUpper %>Repository } from '../adapters/database/<% name %>.repository';
+
+interface I<% nameUpper %>Service {
+  search(limit?: number, skip?: number): Promise<<% nameUpper %>Principal[]>;
+
+  get(id: string): Promise<<% nameUpper %> | null>;
+
+  create(<% name %>: <% nameUpper %>Record): Promise<<% nameUpper %>Principal>;
+
+  update(id: string, blog: <% nameUpper %>Record): Promise<<% nameUpper %>Principal>;
+
+  delete(id: string): Promise<void>;
+}
+
+@Injectable()
+class <% nameUpper %>Service implements I<% nameUpper %>Service {
+  constructor(
+    @Inject(<% nameUpper %>Repository) private readonly repo: I<% nameUpper %>Repository,
+  ) {}
+
+  create(<% name %>: <% nameUpper %>Record): Promise<<% nameUpper %>Principal> {
+    return this.repo.create(<% name %>);
+  }
+
+  delete(id: string): Promise<void> {
+    return this.repo.delete(id);
+  }
+
+  async get(id: string): Promise<<% nameUpper %> | null> {
+    return await this.repo.get(id);
+  }
+
+  search(limit?: number, skip?: number): Promise<<% nameUpper %>Principal[]> {
+    return this.repo.search(limit, skip);
+  }
+
+  update(id: string, <% name %>: <% nameUpper %>Record): Promise<<% nameUpper %>Principal> {
+    return this.repo.update(id, <% name %>);
+  }
+}
+
+export { <% nameUpper %>Service, I<% nameUpper %>Service };

@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=./schema.json
+$schema: ./schema.json
+mode: app
+host:
+  port: 3000
+  host: 0.0.0.0
+
+secret: default_secret
+
+otel:
+  logging:
+    enableAutoAPILogging: false
+    level: info
+    prettify: true
+  metrics:
+    api:
+      enable: false
+      defaultAttributes: {}
+      ignoreRoutes: []
+      ignoreUndefinedRoutes: true
+    exporter:
+      interval: 1000
+      use: none
+    hostMetrics: false
+  trace:
+    exporter:
+      use: none
+app:
+  swagger:
+    title: NestJS API
+    description: Sample NestJS API
+    version: '1.0'
+  landscape: local
+  platform: gotrade
+  service: nestjs
+  designation: api
+
+databases:
+  main:
+    orm:
+      schemaGenerator:
+        disableForeignKeys: false
+      entities: ['./dist/src/**/entities/main/*.entity.js']
+      entitiesTs: ['./src/**/entities/main/*.entity.ts']
+      migrations:
+        path: './migrations/main'
+        pathTs: './migrations/main'
+        allOrNothing: true
+        disableForeignKeys: false
+        dropTables: false
+        safe: true
+        snapshot: true
+        transactional: false
+      seeder:
+        path: './seeders/database/main'
+    connection:
+      port: 5432
+      database: main
+      password: supersecret
+      type: postgresql
+      user: admin
+      host: gotrade-nestjs-main-database.gotrade.svc
+    dev:
+      autoMigrate: true
+      autoSeed: true
+      timeout: 120
+    migration:
+      migrate: true
+      seed: true
+      timeout: 60
+  comment:
+    orm:
+      schemaGenerator:
+        disableForeignKeys: false
+      entities: ['./dist/src/**/entities/comment/*.entity.js']
+      entitiesTs: ['./src/**/entities/comment/*.entity.ts']
+      migrations:
+        path: './migrations/comment'
+        pathTs: './migrations/comment'
+        allOrNothing: true
+        disableForeignKeys: false
+        dropTables: false
+        safe: true
+        snapshot: true
+        transactional: false
+      seeder:
+        path: './seeders/database/comment'
+    connection:
+      port: 3306
+      database: comment
+      password: supersecret
+      type: mysql
+      user: admin
+      host: gotrade-nestjs-comment-database.gotrade.svc
+    dev:
+      autoMigrate: true
+      autoSeed: true
+      timeout: 120
+    migration:
+      migrate: true
+      seed: true
+      timeout: 60
+
+caches:
+  main:
+    migration:
+      autoSeed: false
+    dev:
+      autoSeed: false
+    connection:
+      port: 6379
+      host: gotrade-nestjs-main-cache.gotrade.svc
+      password: supersecret
+      autoResubscribe: true
+      commandTimeout: 2000 # 2 seconds
+      connectTimeout: 120000 # 120 seconds
+      enableAutoPipelining: true
+      keyPrefix: main
+      tls: false
+      readOnly: false
+
+storages:
+  main:
+    connection:
+      port: 9000
+      useSSL: false
+      endpoint: gotrade-nestjs-main-storage.gotrade.svc
+      access: admin
+      secret: supersecret
+      bucket: main
+    dev:
+      autoSeed: true
+      timeout: 120
+      autoMigrate: true
+    migration:
+      autoMigrate: false
+      timeout: 60
+      autoSeed: false

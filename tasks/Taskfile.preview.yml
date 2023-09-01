@@ -1,0 +1,23 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the project
+    internal: true
+    cmds:
+      - nest build
+  preview:
+    desc: Run configs
+    internal: true
+    deps:
+      - build
+    env:
+      LANDSCAPE: '{{.LANDSCAPE}}'
+    cmds:
+      - doppler run -p "$PLATFORM-$SERVICE" -c "{{.LANDSCAPE}}" -- node dist/src/main
+  staging:
+    desc: Preview with Staging Config
+    cmds:
+      - task: preview
+        vars:
+          LANDSCAPE: staging

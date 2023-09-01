@@ -1,0 +1,521 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "ApiConfig": {
+            "properties": {
+                "defaultAttributes": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "ignoreRoutes": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "ignoreUndefinedRoutes": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "AppConfig": {
+            "properties": {
+                "designation": {
+                    "type": "string"
+                },
+                "landscape": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                },
+                "swagger": {
+                    "$ref": "#/definitions/SwaggerConfig"
+                }
+            },
+            "type": "object"
+        },
+        "CacheConfig": {
+            "properties": {
+                "connection": {
+                    "$ref": "#/definitions/ConnectionConfig_1"
+                },
+                "dev": {
+                    "$ref": "#/definitions/DevConfig_1"
+                },
+                "migration": {
+                    "$ref": "#/definitions/MigrationConfig_2"
+                }
+            },
+            "type": "object"
+        },
+        "ConnectionConfig": {
+            "properties": {
+                "database": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                },
+                "type": {
+                    "enum": [
+                        "mysql",
+                        "postgresql"
+                    ],
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ConnectionConfig_1": {
+            "properties": {
+                "autoResubscribe": {
+                    "type": "boolean"
+                },
+                "commandTimeout": {
+                    "type": "number"
+                },
+                "connectTimeout": {
+                    "type": "number"
+                },
+                "enableAutoPipelining": {
+                    "type": "boolean"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "keyPrefix": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                },
+                "readOnly": {
+                    "type": "boolean"
+                },
+                "tls": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "ConnectionConfig_2": {
+            "properties": {
+                "access": {
+                    "type": "string"
+                },
+                "bucket": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "useSSL": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "DatabaseConfig": {
+            "properties": {
+                "connection": {
+                    "$ref": "#/definitions/ConnectionConfig"
+                },
+                "dev": {
+                    "$ref": "#/definitions/DevConfig"
+                },
+                "driverOptions": {},
+                "migration": {
+                    "$ref": "#/definitions/MigrationConfig"
+                },
+                "orm": {
+                    "$ref": "#/definitions/OrmConfig"
+                }
+            },
+            "type": "object"
+        },
+        "DevConfig": {
+            "properties": {
+                "autoMigrate": {
+                    "type": "boolean"
+                },
+                "autoSeed": {
+                    "type": "boolean"
+                },
+                "timeout": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "DevConfig_1": {
+            "properties": {
+                "autoSeed": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "DevConfig_2": {
+            "properties": {
+                "autoMigrate": {
+                    "type": "boolean"
+                },
+                "autoSeed": {
+                    "type": "boolean"
+                },
+                "timeout": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "ExporterConfig": {
+            "properties": {
+                "interval": {
+                    "type": "number"
+                },
+                "otlp": {
+                    "$ref": "#/definitions/OtlpConfig"
+                },
+                "use": {
+                    "enum": [
+                        "console",
+                        "none",
+                        "otlp"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ExporterConfig_1": {
+            "properties": {
+                "otlp": {
+                    "$ref": "#/definitions/OtlpConfig_1"
+                },
+                "use": {
+                    "enum": [
+                        "console",
+                        "none",
+                        "otlp"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "HostConfig": {
+            "properties": {
+                "host": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "LoggingConfig": {
+            "properties": {
+                "enableAutoAPILogging": {
+                    "type": "boolean"
+                },
+                "level": {
+                    "type": "string"
+                },
+                "prettify": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "MetricsConfig": {
+            "properties": {
+                "api": {
+                    "$ref": "#/definitions/ApiConfig"
+                },
+                "exporter": {
+                    "$ref": "#/definitions/ExporterConfig"
+                },
+                "hostMetrics": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "MigrationConfig": {
+            "properties": {
+                "migrate": {
+                    "type": "boolean"
+                },
+                "seed": {
+                    "type": "boolean"
+                },
+                "timeout": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "MigrationConfig_1": {
+            "properties": {
+                "allOrNothing": {
+                    "type": "boolean"
+                },
+                "disableForeignKeys": {
+                    "type": "boolean"
+                },
+                "dropTables": {
+                    "type": "boolean"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "pathTs": {
+                    "type": "string"
+                },
+                "safe": {
+                    "type": "boolean"
+                },
+                "snapshot": {
+                    "type": "boolean"
+                },
+                "transactional": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "MigrationConfig_2": {
+            "properties": {
+                "autoSeed": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "MigrationConfig_3": {
+            "properties": {
+                "autoMigrate": {
+                    "type": "boolean"
+                },
+                "autoSeed": {
+                    "type": "boolean"
+                },
+                "timeout": {
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "OrmConfig": {
+            "properties": {
+                "entities": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "entitiesTs": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "migrations": {
+                    "$ref": "#/definitions/MigrationConfig_1"
+                },
+                "schemaGenerator": {
+                    "$ref": "#/definitions/SchemaGeneratorConfig"
+                },
+                "seeder": {
+                    "$ref": "#/definitions/SeederConfig"
+                }
+            },
+            "type": "object"
+        },
+        "OtelConfig": {
+            "properties": {
+                "logging": {
+                    "$ref": "#/definitions/LoggingConfig"
+                },
+                "metrics": {
+                    "$ref": "#/definitions/MetricsConfig"
+                },
+                "trace": {
+                    "$ref": "#/definitions/TraceConfig"
+                }
+            },
+            "type": "object"
+        },
+        "OtlpConfig": {
+            "properties": {
+                "compression": {
+                    "enum": [
+                        "gzip",
+                        "none"
+                    ],
+                    "type": "string"
+                },
+                "headers": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "timeout": {
+                    "type": "number"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "OtlpConfig_1": {
+            "properties": {
+                "compression": {
+                    "enum": [
+                        "gzip",
+                        "none"
+                    ],
+                    "type": "string"
+                },
+                "headers": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "timeout": {
+                    "type": "number"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SchemaGeneratorConfig": {
+            "properties": {
+                "disableForeignKeys": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "SeederConfig": {
+            "properties": {
+                "path": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "StorageConfig": {
+            "properties": {
+                "connection": {
+                    "$ref": "#/definitions/ConnectionConfig_2"
+                },
+                "dev": {
+                    "$ref": "#/definitions/DevConfig_2"
+                },
+                "migration": {
+                    "$ref": "#/definitions/MigrationConfig_3"
+                }
+            },
+            "type": "object"
+        },
+        "SwaggerConfig": {
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "TraceConfig": {
+            "properties": {
+                "exporter": {
+                    "$ref": "#/definitions/ExporterConfig_1"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "app": {
+            "$ref": "#/definitions/AppConfig"
+        },
+        "caches": {
+            "additionalProperties": {
+                "$ref": "#/definitions/CacheConfig"
+            },
+            "type": "object"
+        },
+        "databases": {
+            "additionalProperties": {
+                "$ref": "#/definitions/DatabaseConfig"
+            },
+            "type": "object"
+        },
+        "host": {
+            "$ref": "#/definitions/HostConfig"
+        },
+        "mode": {
+            "enum": [
+                "app",
+                "migration"
+            ],
+            "type": "string"
+        },
+        "otel": {
+            "$ref": "#/definitions/OtelConfig"
+        },
+        "secret": {
+            "type": "string"
+        },
+        "storages": {
+            "additionalProperties": {
+                "$ref": "#/definitions/StorageConfig"
+            },
+            "type": "object"
+        }
+    },
+    "type": "object"
+}
+

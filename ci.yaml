@@ -1,0 +1,274 @@
+name: 'CI/CD'
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+env:
+  # -- prefix in the gist to store the test results. Change this to your LPSD's P-S
+  GIST_PREFIX: 'gotrade-nestjs'
+  # -- The branch where images will push with the :latest tag
+  DOCKER_LATEST_BRANCH: 'develop'
+  # -- Harbor user. Change `esd` to your team
+  HARBOR_USER: 'robot_esd+harbor'
+  # -- Harbor password. Change `esd` to your team
+  HARBOR_PASSWORD: ${{ secrets.HARBOR_ESD_SECRET }}
+  # -- Harbor project. Change `esd` to your team
+  HARBOR_PROJECT: 'esd'
+  # -- state to store the test results (don't need to change this usually)
+  GIST_ID: 3552382c230547da39350815400ee665
+  # -- Domain for docker images to be stored (don't need to change this usually)
+  DOCKER_DOMAIN: harbor.admin.tr8.tech
+  # Unit Test coverage below this will be warned
+  UNIT_TEST_WARN: 10
+  # Unit Test coverage below this will fail
+  UNIT_TEST_FAIL: 5
+  # Integration Test coverage below this will be warned
+  INTEGRATION_TEST_WARN: 10
+  # Integration Test coverage below this will fail
+  INTEGRATION_TEST_FAIL: 5
+
+jobs:
+  unit:
+    name: 'Unit Tests'
+    runs-on:
+      - nix
+      - ARM64
+    steps:
+      - name: Gotrade CI Environment
+        uses: kirinnee/atomici-action@v2.3.1
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Emulate Nix Shell
+        run: nix develop .#ci -c scripts/ci/export_path.sh
+
+      - name: Run Unit Tests
+        run: scripts/ci/unit_test.sh
+
+      - name: Extract Test Data
+        id: unit-test-data
+        uses: tr8team/actions.gotrade-test-data@v1.1.2
+        with:
+          name: Unit
+          cf_token: '${{ secrets.CLOUDFLARE_API_TOKEN }}'
+          cf_acc_id: '${{ secrets.CLOUDFLARE_ACCOUNT_ID }}'
+          cf_project_name: ci-gotrade
+          test_report_path: test-results/unit/html
+          coverage_report_path: test-results/unit/coverage
+          test_result_path: './test-results/unit/result.json'
+          coverage_result_path: './test-results/unit/coverage/coverage-summary.json'
+    outputs:
+      testResult: ${{ steps.unit-test-data.outputs.test }}
+      testCoverage: ${{ steps.unit-test-data.outputs.coverage }}
+  int:
+    name: 'Integration Test'
+    runs-on:
+      - nix
+      - ARM64
+    steps:
+      - name: Gotrade CI Environment
+        uses: kirinnee/atomici-action@v2.3.1
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Emulate Nix Shell
+        run: nix develop .#ci -c scripts/ci/export_path.sh
+      - name: Integration Tests
+        run: scripts/ci/integration_test.sh
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+      - name: Extract Test Data
+        id: int-test-data
+        uses: tr8team/actions.gotrade-test-data@v1.1.2
+        with:
+          name: Integration
+          cf_token: '${{ secrets.CLOUDFLARE_API_TOKEN }}'
+          cf_acc_id: '${{ secrets.CLOUDFLARE_ACCOUNT_ID }}'
+          cf_project_name: ci-gotrade
+          test_report_path: test-results/int/html
+          coverage_report_path: test-results/int/coverage
+          test_result_path: './test-results/int/result.json'
+          coverage_result_path: './test-results/int/coverage/coverage-summary.json'
+    outputs:
+      testResult: ${{ steps.int-test-data.outputs.test }}
+      testCoverage: ${{ steps.int-test-data.outputs.coverage }}
+  testprocess:
+    name: Process Test Results
+    needs:
+      - unit
+      - int
+    runs-on:
+      - nix
+      - ARM64
+    steps:
+      - name: Gotrade CI Environment
+        uses: kirinnee/atomici-action@v2.3.1
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Gotrade Proccess Data Action
+        id: gotrade-test-processing
+        uses: tr8team/actions.gotrade-test-processing@v1.3.0
+        with:
+          unit_test_output: ${{needs.unit.outputs.testResult}}
+          unit_cover_output: ${{needs.unit.outputs.testCoverage}}
+          integration_test_output: ${{needs.int.outputs.testResult}}
+          integration_cover_output: ${{needs.int.outputs.testCoverage}}
+
+          gist_id: '${{ env.GIST_ID }}'
+          gist_github_token: ${{ secrets.GIST_TOKEN }}
+          gist_prefix: '${{ env.GIST_PREFIX }}'
+
+          # guards
+          unit_test_warn: '0'
+          unit_test_fail: '0'
+          integration_test_warn: '0'
+          integration_test_fail: '0'
+          unit_cover_warn: '${{ env.UNIT_TEST_WARN }}'
+          unit_cover_fail: '${{ env.UNIT_TEST_FAIL }}'
+          integration_cover_warn: '${{ env.INTEGRATION_TEST_WARN }}'
+          integration_cover_fail: '${{ env.INTEGRATION_TEST_FAIL }}'
+    outputs:
+      badges: ${{ steps.gotrade-test-processing.outputs.badges }}
+  precommit:
+    name: Pre-commit Check
+    runs-on:
+      - nix
+      - ARM64
+    steps:
+      - name: Gotrade CI Environment
+        uses: kirinnee/atomici-action@v2.3.1
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Run pre-commit
+        run: nix develop .#ci -c ./scripts/ci/pre-commit.sh
+  build:
+    name: Build Docker Images
+    runs-on:
+      - ARM64
+      - nix
+      - docker
+    strategy:
+      matrix:
+        configs:
+          - image-name: api-arm
+            dockerfile: ./infra/migrate.Dockerfile
+            context: .
+            platform: linux/arm64
+          - image-name: migrate-arm
+            dockerfile: ./infra/Dockerfile
+            context: .
+            platform: linux/arm64
+            # un-comment for AMD variants
+    #          - image-name: api-amd
+    #            dockerfile: ./infra/migrate.Dockerfile
+    #            context: .
+    #            platform: linux/amd64
+    #          - image-name: migrate-amd
+    #            dockerfile: ./infra/Dockerfile
+    #            context: .
+    #            platform: linux/amd64
+    env:
+      STRAT_DOCKER_IMAGE: ${{ matrix.configs.image-name }}
+      STRAT_DOCKERFILE: ${{ matrix.configs.dockerfile }}
+      STRAT_DOCKER_CONTEXT: ${{ matrix.configs.context }}
+      STRAT_DOCKER_PLATFORM: ${{ matrix.configs.platform }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: rlespinasse/github-slug-action@v3.x
+      - name: Build and Push Docker
+        run: ./scripts/ci/docker.sh
+        env:
+          CI_DOCKER_IMAGE: ${{ env.STRAT_DOCKER_IMAGE }}
+          CI_DOCKER_CONTEXT: ${{ env.STRAT_DOCKER_CONTEXT }}
+          CI_DOCKERFILE: ${{ env.STRAT_DOCKERFILE }}
+          CI_DOCKER_PLATFORM: ${{ env.STRAT_DOCKER_PLATFORM }}
+
+          DOMAIN: ${{ env.DOCKER_DOMAIN }}
+
+          GITHUB_REPO_REF: ${{ env.HARBOR_PROJECT }}/${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_BRANCH: ${{ env.GITHUB_REF_SLUG_URL }}
+
+          DOCKER_PASSWORD: ${{ env.HARBOR_PASSWORD }}
+          DOCKER_USER: ${{ env.HARBOR_USER }}
+
+          S3_KEY_ID: ${{ secrets.R2_KEY_ID }}
+          S3_KEY_SECRET: ${{ secrets.R2_KEY_SECRET }}
+          S3_URL: 'https://9f21cac25548ad04899fc78c8101e7de.r2.cloudflarestorage.com'
+          S3_BUCKET: 'ci-cache'
+          S3_REGION: 'APAC'
+
+          LATEST_BRANCH: ${{ env.DOCKER_LATEST_BRANCH }}
+  helm:
+    name: Build & Publish Helm Chart
+    needs: build
+    runs-on:
+      - ARM64
+      - nix
+    steps:
+      - name: Gotrade CI Environment
+        uses: kirinnee/atomici-action@v2.3.1
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN_SEMANTIC_RELEASE }}
+          fetch-depth: 0
+
+      - name: Inject Github Variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Build & Publish Helm Chart
+        env:
+          DOMAIN: ${{ env.DOCKER_DOMAIN }}
+
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_BRANCH: ${{ env.GITHUB_REF_SLUG_URL }}
+
+          HARBOR_USER: ${{ env.HARBOR_USER }}
+          HARBOR_PASSWORD: ${{ env.HARBOR_PASSWORD }}
+          HARBOR_CHART_REF: chartrepo/${{ env.HARBOR_PROJECT }}
+        run: nix develop .#ci -c scripts/ci/helm.sh
+  release:
+    name: Semantic Release Helm Chart
+    needs:
+      - helm
+      - testprocess
+      - precommit
+    if: github.ref == 'refs/heads/main'
+    runs-on:
+      - ARM64
+      - nix
+    steps:
+      - name: Gotrade CI Environment
+        uses: kirinnee/atomici-action@v2.3.1
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN_SEMANTIC_RELEASE }}
+          fetch-depth: 0
+      - name: Inject Github Variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: Build & Publish Helm Chart
+        env:
+          BADGES: ${{ needs.testprocess.outputs.badges }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_SEMANTIC_RELEASE }}
+          DOMAIN: ${{ env.DOCKER_DOMAIN }}
+
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_BRANCH: ${{ env.GITHUB_REF_SLUG_URL }}
+
+          HARBOR_USER: ${{ env.HARBOR_USER }}
+          HARBOR_PASSWORD: ${{ env.HARBOR_PASSWORD }}
+          HARBOR_CHART_REF: chartrepo/${{ env.HARBOR_PROJECT }}
+        run: nix develop .#ci -c scripts/ci/release.sh

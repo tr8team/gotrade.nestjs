@@ -1,0 +1,31 @@
+version: '3'
+
+includes:
+  local:
+    taskfile: tasks/Taskfile.helm.yml
+    vars:
+      LANDSCAPE: '.local'
+  local-prod:
+    taskfile: tasks/Taskfile.helm.yml
+    vars:
+      LANDSCAPE: '.local-prod'
+  test:
+    taskfile: tasks/Taskfile.helm.yml
+    vars:
+      LANDSCAPE: '.test'
+  ci:
+    taskfile: tasks/Taskfile.helm.yml
+    vars:
+      LANDSCAPE: '.ci'
+  staging:
+    taskfile: tasks/Taskfile.helm.yml
+    vars:
+      LANDSCAPE: '.staging'
+  admin:
+    taskfile: tasks/Taskfile.helm.yml
+    vars:
+      LANDSCAPE: '.admin'
+  prod-indo:
+    taskfile: tasks/Taskfile.helm.yml
+    vars:
+      LANDSCAPE: '.prod-indo'

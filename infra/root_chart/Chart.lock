@@ -1,0 +1,24 @@
+dependencies:
+- name: gotrade-nestjs-api
+  repository: file://../api_chart
+  version: 0.1.0
+- name: gotrade-nestjs-migration
+  repository: file://../migration_chart
+  version: 0.1.0
+- name: gotrade-nestjs-test
+  repository: file://../test_chart
+  version: 0.1.0
+- name: dragonfly
+  repository: oci://ghcr.io/dragonflydb/dragonfly/helm
+  version: v1.8.0
+- name: minio
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 12.7.0
+- name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 12.5.5
+- name: mysql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 9.10.10
+digest: sha256:433fdc3d9bfddaf8a74d932fcd30f0e575cf815fda352b95b7a299e090598d27
+generated: "2023-08-23T16:10:50.258254+08:00"

@@ -1,0 +1,15 @@
+version: '3'
+
+includes:
+  # ORM configurations
+  #--scaffold database start--
+  main:
+    taskfile: tasks/Taskfile.orm.yml
+    vars:
+      GT_DATABASE: main
+
+  comment:
+    taskfile: tasks/Taskfile.orm.yml
+    vars:
+      GT_DATABASE: comment
+#--scaffold database end--

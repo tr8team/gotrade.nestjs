@@ -1,0 +1,13 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: test
+servers: 1
+agents: 0
+network: test
+image: rancher/k3s:v1.25.12-k3s1
+registries:
+  create:
+    name: test.registry.lvh.me
+    host: "0.0.0.0"
+    hostPort: "10016"

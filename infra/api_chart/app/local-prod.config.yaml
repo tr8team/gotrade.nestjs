@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=./schema.json
+$schema: ./schema.json
+app:
+  landscape: local-prod
+databases:
+  main:
+    dev:
+      autoMigrate: false
+      autoSeed: false
+    migration:
+      migrate: true
+      seed: true
+  comment:
+    dev:
+      autoMigrate: false
+      autoSeed: false
+    migration:
+      migrate: true
+      seed: true
+caches:
+  main:
+    dev:
+      autoSeed: false
+    migration:
+      autoSeed: true
+storages:
+  main:
+    dev:
+      autoSeed: false
+      autoMigrate: false
+    migration:
+      autoSeed: true
+      autoMigrate: true
+      timeout: 120

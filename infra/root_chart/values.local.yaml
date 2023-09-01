@@ -1,0 +1,65 @@
+landscape: &l local
+
+secret:
+  name: &secret "gotrade-nestjs-secrets"
+  doppler:
+    enable: false
+  fake:
+    enable: true
+    path: env/.env.local
+
+migration:
+  enable: false
+
+test:
+  enable: false
+
+api:
+  serviceTree:
+    landscape: *l
+
+  envFromSecret: *secret
+
+  replicaCount: 1
+
+  service:
+    port: 80
+    containerPort: 3000
+
+  image:
+    repository: gotrade-nestjs-api
+
+  ingress:
+    enabled: true
+    className: "traefik"
+    hosts:
+      - host: api.nestjs.gotrade.local.lvh.me
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: [ ]
+
+  podSecurityContext: { }
+  securityContext: { }
+
+  livenessProbe:
+    initialDelaySeconds: 60
+  readinessProbe:
+    initialDelaySeconds: 60
+
+  mountConfig: false
+
+  config:
+    mode: app
+
+maincache:
+  enable: true
+
+maindb:
+  enable: true
+
+commentdb:
+  enable: true
+
+mainstorage:
+  enable: true

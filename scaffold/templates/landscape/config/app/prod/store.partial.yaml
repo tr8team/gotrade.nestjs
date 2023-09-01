@@ -1,0 +1,12 @@
+
+<% name %>:
+  dev:
+    autoMigrate: false
+    autoSeed: false
+  migration:
+    autoSeed: <% auto %>
+    autoMigrate: <% auto %>
+  connection:
+    port: 443
+    useSSL: true
+    endpoint: s3.amazonaws.com

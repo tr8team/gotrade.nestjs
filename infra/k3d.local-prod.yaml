@@ -1,0 +1,20 @@
+apiVersion: k3d.io/v1alpha4
+kind: Simple
+metadata:
+  name: local-prod
+servers: 1
+agents: 1
+network: local-prod
+image: rancher/k3s:v1.25.12-k3s1
+ports:
+  - port: 10013:80
+    nodeFilters:
+      - loadbalancer
+  - port: 10014:443
+    nodeFilters:
+      - loadbalancer
+registries:
+  create:
+    name: local-prod.registry.lvh.me
+    host: "0.0.0.0"
+    hostPort: "10015"

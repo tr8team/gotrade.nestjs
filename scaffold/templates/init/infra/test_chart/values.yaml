@@ -1,0 +1,65 @@
+serviceTree:
+  landscape: develop
+  platform: <% platform %>
+  service: <% service %>
+  designation: test
+  layer: "2"
+  team: <% team %>
+
+image:
+  repository: <% platform %>-<% service %>-test
+  pullPolicy: IfNotPresent
+  tag: ""
+
+envFromSecret: ""
+
+command: []
+
+mountConfig: true
+
+config: {}
+
+imagePullSecrets: [ ]
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: { }
+  name: ""
+
+podAnnotations: { }
+
+podSecurityContext: { }
+#  runAsNonRoot: true
+#  runAsUser: 10001
+#  runAsGroup: 10001
+
+securityContext: {}
+  #  runAsNonRoot: true
+#  runAsUser: 10001
+#  runAsGroup: 10001
+#  privileged: false
+#  seccompProfile:
+#    type: RuntimeDefault
+#  allowPrivilegeEscalation: false
+#  capabilities:
+#    drop:
+#      - ALL
+#  readOnlyRootFilesystem: false
+
+
+resources:
+  limits:
+    cpu: 2
+    memory: 4Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }

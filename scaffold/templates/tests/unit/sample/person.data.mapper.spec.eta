@@ -1,0 +1,123 @@
+import { describe, should as s } from 'vitest';
+import {
+  <% nameUpper %>,
+  <% nameUpper %>Principal,
+  <% nameUpper %>Record,
+} from '../../../src/sample/domain/models/person.model';
+import { <% nameUpper %>DataMapper } from '../../../src/sample/adapters/database/person.mapper';
+import { <% nameUpper %>Entity } from '../../../src/sample/adapters/database/entities/main/person.entity';
+<% test.unit.data.imports %>
+
+s();
+
+describe('<% nameUpper %>DataMapper', () => {
+  const service = new <% nameUpper %>DataMapper();
+
+  describe('toDomain', () => {
+    it('should convert <% nameUpper %>Entity to <% nameUpper %>', () => {
+      const subj: <% nameUpper %>Entity = {
+<% test.unit.data.toDomain.subj %>
+        id: '<% test.unit.data.toDomain.id %>',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const ex: <% nameUpper %> = {
+        principal: {
+          id: '<% test.unit.data.toDomain.id %>',
+          record: {
+<% test.unit.data.toDomain.ex %>
+          },
+        },
+      };
+
+      const act = service.toDomain(subj);
+      act.should.deep.equal(ex);
+    });
+  });
+
+  describe('toPrincipal', () => {
+    it('should convert <% nameUpper %>Entity to <% nameUpper %>Principal', () => {
+      const subj: <% nameUpper %>Entity = {
+<% test.unit.data.toPrincipal.subj %>
+        id: '<% test.unit.data.toPrincipal.id %>',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const ex: <% nameUpper %>Principal = {
+        id: '<% test.unit.data.toPrincipal.id %>',
+        record: {
+<% test.unit.data.toPrincipal.ex %>
+        },
+      };
+
+      const act = service.toPrincipal(subj);
+      act.should.deep.equal(ex);
+    });
+  });
+
+  describe('toRecord', () => {
+    it('should convert <% nameUpper %>Entity to <% nameUpper %>Record', () => {
+      const subj: <% nameUpper %>Entity = {
+<% test.unit.data.toRecord.subj %>
+        id: '<% test.unit.data.toRecord.id %>',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const ex: <% nameUpper %>Record = {
+<% test.unit.data.toRecord.ex %>
+      };
+      const act = service.toRecord(subj);
+      act.should.deep.equal(ex);
+    });
+  });
+
+  describe('fromRecord', () => {
+    it('should convert <% nameUpper %>Entity from <% nameUpper %>Record', () => {
+      const subj: <% nameUpper %>Record = {
+<% test.unit.data.fromRecord.subj %>
+      };
+      const ex: <% nameUpper %>Entity = {
+<% test.unit.data.fromRecord.ex %>
+        id: null!,
+        createdAt: null!,
+        updatedAt: null!,
+      };
+      const act = service.fromRecord(subj);
+      // correct random generation
+      ex.id = act.id;
+      ex.createdAt = act.createdAt;
+      ex.updatedAt = act.updatedAt;
+
+      act.should.deep.equal(ex);
+    });
+  });
+
+  describe('fromPrincipal', () => {
+    it('should convert <% nameUpper %>Entity from <% nameUpper %>Principal', () => {
+      const subj: <% nameUpper %>Principal = {
+        record: {
+<% test.unit.data.fromPrincipal.subj %>
+        },
+        id: '<% test.unit.data.fromPrincipal.id %>',
+      };
+
+      const ex: <% nameUpper %>Entity = {
+<% test.unit.data.fromPrincipal.ex %>
+        id: '<% test.unit.data.fromPrincipal.id %>',
+        createdAt: null!,
+        updatedAt: null!,
+      };
+
+      const act = service.fromPrincipal(subj);
+
+      // correct random generation
+      ex.createdAt = act.createdAt;
+      ex.updatedAt = act.updatedAt;
+
+      act.should.deep.equal(ex);
+    });
+  });
+});

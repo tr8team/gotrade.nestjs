@@ -1,0 +1,9 @@
+name: string
+age: number
+verified: boolean
+email: email
+random: uuid
+twitter: url
+now: instant
+open: time
+dob: date

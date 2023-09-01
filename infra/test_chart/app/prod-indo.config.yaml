@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=./schema.json
+$schema: ./schema.json
+mode: app
+host:
+  port: 3000
+  host: '::'
+app:
+  landscape: prod-indo
+  swagger:
+    title: Production Indo Gotrade NestJS API
+    description: NestJS API is a template API for Gotraders to create microservices
+    version: '1.0'
+databases:
+  main:
+    dev:
+      autoMigrate: false
+      autoSeed: false
+    migration:
+      migrate: true
+      seed: true
+      timeout: 30
+    driverOptions:
+      connection:
+        ssl: true
+  comment:
+    dev:
+      autoMigrate: false
+      autoSeed: false
+    migration:
+      migrate: true
+      seed: true
+      timeout: 30
+    driverOptions:
+      connection:
+        ssl:
+          rejectUnauthorized: true
+caches:
+  main:
+    dev:
+      autoSeed: false
+    migration:
+      autoSeed: true
+    connection:
+      tls: true
+storages:
+  main:
+    dev:
+      autoMigrate: false
+      autoSeed: false
+    migration:
+      autoSeed: true
+      autoMigrate: true
+    connection:
+      port: 443
+      useSSL: true
+      endpoint: s3.amazonaws.com

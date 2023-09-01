@@ -1,0 +1,35 @@
+
+<% name %>:
+  orm:
+    schemaGenerator:
+      disableForeignKeys: false
+    entities:
+      - ./dist/src/**/entities/<% name %>/*.entity.js
+    entitiesTs:
+      - ./src/**/entities/<% name %>/*.entity.ts
+    migrations:
+      path: ./migrations/<% name %>
+      pathTs: ./migrations/<% name %>
+      allOrNothing: true
+      disableForeignKeys: false
+      dropTables: false
+      safe: true
+      snapshot: true
+      transactional: false
+    seeder:
+      path: ./seeders/database/<% name %>
+  connection:
+    type: postgresql
+    port: 5432
+    user: admin
+    password: supersecret
+    database: <% name %>
+    host: <% platform %>-<% service %>-<% name %>-database.<% platform %>.svc
+  dev:
+    autoMigrate: true
+    autoSeed: true
+    timeout: 120
+  migration:
+    migrate: true
+    seed: true
+    timeout: 60

@@ -1,0 +1,58 @@
+{{- if .Values.secret.doppler.enable }}
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ template "<% platform %>-<% service %>-root.fullname-with-suffix" (dict "arg" "doppler-secret" "root" .) }}
+  labels: {{- include "<% platform %>-<% service %>-root.labels" . | nindent 4 }}
+  annotations: {{- include "<% platform %>-<% service %>-root.annotations" . | nindent 4 }}
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+spec:
+  secretStoreRef:
+    kind: {{ .Values.secret.doppler.secretStore.kind }}
+    name: {{ .Values.secret.doppler.secretStore.name }}
+  target:
+    name: {{ template "<% platform %>-<% service %>-root.fullname-with-suffix" (dict "arg" .Values.secret.doppler.target "root" .) }}
+  data:
+    - secretKey: {{ .Values.secret.doppler.secretKey }}
+      remoteRef:
+        key: {{ .Values.secret.doppler.remoteRef }}
+---
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: {{ template "<% platform %>-<% service %>-root.fullname-with-suffix" (dict "arg" .Values.secret.doppler.name "root" .) }}
+  labels: {{- include "<% platform %>-<% service %>-root.labels" . | nindent 4 }}
+  annotations: {{- include "<% platform %>-<% service %>-root.annotations" . | nindent 4 }}
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-4"
+spec:
+  provider:
+    doppler:
+      auth:
+        secretRef:
+          dopplerToken:
+            name: {{ template "<% platform %>-<% service %>-root.fullname-with-suffix" (dict "arg" .Values.secret.doppler.target "root" .) }}
+            key: {{ .Values.secret.doppler.secretKey }}
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: {{ template "<% platform %>-<% service %>-root.fullname-with-suffix" (dict "arg" .Values.secret.name "root" .) }}
+  labels: {{- include "<% platform %>-<% service %>-root.labels" . | nindent 4 }}
+  annotations: {{- include "<% platform %>-<% service %>-root.annotations" . | nindent 4 }}
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-2"
+spec:
+  secretStoreRef:
+    kind: SecretStore
+    name: {{ template "<% platform %>-<% service %>-root.fullname-with-suffix" (dict "arg" .Values.secret.doppler.name "root" .) }}
+
+  target:
+    name: {{ .Values.secret.name }}
+
+  dataFrom:
+    - find:
+        name:
+          regexp: .*
+{{- end }}

@@ -1,0 +1,53 @@
+landscape: &l test
+
+secret:
+  name: &secret "gotrade-nestjs-secrets"
+  doppler:
+    enable: false
+  fake:
+    enable: true
+    path: env/.env.test
+
+migration:
+  enable: false
+
+api:
+  enable: false
+
+# -- integration test configuration
+test:
+  # -- service tree override landscape
+  serviceTree:
+    landscape: *l
+
+  # -- secret to mount as env to use for api
+  envFromSecret: *secret
+
+  # -- image to pull
+  image:
+    repository: gotrade-nestjs-test
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  # -- command to execute to run test
+  command: [ "vitest", "watch", "--config", "./config/test/vitest.int.dev.config.ts" ]
+#  command: [ "ash", "-c", "sleep infinity" ]
+
+  mountConfig: true
+  # -- override any config you want here
+  config: { }
+
+# -- configuring the main database, Postgres example
+maindb:
+  enable: true
+
+maincache:
+  enable: true
+
+commentdb:
+  enable: true
+
+mainstorage:
+  enable: true
+
+

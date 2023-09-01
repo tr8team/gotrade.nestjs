@@ -1,0 +1,53 @@
+landscape: &l ci
+
+secret:
+  name: &secret "gotrade-nestjs-secrets"
+  doppler:
+    enable: false
+  fake:
+    enable: true
+    path: env/.env.ci
+
+migration:
+  enable: false
+
+api:
+  enable: false
+
+# -- integration test configuration
+test:
+  # -- service tree override landscape
+  serviceTree:
+    landscape: *l
+
+  envFromSecret: *secret
+
+  volume:
+    enable: true
+    name: test-result-volume
+
+  # -- image to pull
+  image:
+    repository: gotrade-nestjs-test
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  # -- command to execute to run test
+  command: [ "/app/scripts/start_test.sh" ]
+  #  command: [ "ash", "-c", "sleep infinity" ]
+
+  mountConfig: true
+  # -- override any config you want here
+  config: { }
+
+maincache:
+  enable: true
+
+maindb:
+  enable: true
+
+commentdb:
+  enable: true
+
+mainstorage:
+  enable: true
