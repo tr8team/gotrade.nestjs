@@ -3,9 +3,9 @@ import {
   <% nameUpper %>,
   <% nameUpper %>Principal,
   <% nameUpper %>Record,
-} from '../../../src/sample/domain/models/person.model';
-import { <% nameUpper %>DataMapper } from '../../../src/sample/adapters/database/person.mapper';
-import { <% nameUpper %>Entity } from '../../../src/sample/adapters/database/entities/main/person.entity';
+} from '../../../src/sample/domain/models/<% name %>.model';
+import { <% nameUpper %>DataMapper } from '../../../src/sample/adapters/database/<% name %>.mapper';
+import { <% nameUpper %>Entity } from '../../../src/sample/adapters/database/entities/main/<% name %>.entity';
 <% test.unit.data.imports %>
 
 s();
