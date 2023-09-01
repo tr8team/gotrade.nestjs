@@ -17,6 +17,7 @@ import {
   NotificationPoller,
   RemoveOptions,
   ReplicationConfig,
+  ReplicationConfigOpts,
   Retention,
   SelectOptions,
   Tag,
@@ -104,7 +105,9 @@ class StorageService {
     return this.minio.removeBucketEncryption(this.bucket);
   }
 
-  setBucketReplication(replicationConfig: ReplicationConfig): Promise<void> {
+  setBucketReplication(
+    replicationConfig: ReplicationConfigOpts,
+  ): Promise<void> {
     return this.minio.setBucketReplication(this.bucket, replicationConfig);
   }
 
