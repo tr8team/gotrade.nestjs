@@ -16,6 +16,7 @@ import * as execa from 'execa';
 import * as process from 'process';
 import validator from 'validator';
 import * as chalk from 'chalk';
+import axios from 'axios';
 
 const templateFolder = path.resolve(__dirname, './templates/init');
 
@@ -28,6 +29,13 @@ const etaConfig: Partial<EtaConfig> = {
   useWith: true,
   autoTrim: false,
 };
+
+async function run(s: string, arg: string[]) {
+  const p = execa(s, arg);
+  p.stdout?.pipe(process.stdout);
+  p.stderr?.pipe(process.stderr);
+  await p;
+}
 
 function terraformLandscapes(landscapes: string[]): string {
   return landscapes
@@ -104,25 +112,23 @@ const askPostgres = createLoopQuestion('PostgreSQL', db);
 const askStore = createLoopQuestion('S3 Bucket', storage);
 
 async function start(): Promise<[string, string]> {
+  const reqPlatform = await axios.get(
+    'https://api.jetty.systems.admin.tr8.tech/api/v1/platform',
+  );
+
+  const platforms = reqPlatform.data as {
+    name: string;
+    slug: string;
+    description: string;
+  }[];
+
   const platform = await select({
     message: 'Platform',
-    choices: [
-      {
-        name: 'Gotrade',
-        value: 'gotrade',
-        description: 'For Gotrade main product',
-      },
-      {
-        name: 'Systems',
-        value: 'systems',
-        description: 'Internal tooling for system team',
-      },
-      {
-        name: 'Data',
-        value: 'data',
-        description: 'Data and AI tooling for Data/AI team',
-      },
-    ],
+    choices: platforms.map(({ name, slug, description }) => ({
+      name,
+      value: slug,
+      description,
+    })),
   });
   const service = (
     await input({
@@ -183,15 +189,25 @@ async function start(): Promise<[string, string]> {
   const intErr = parseInt(intError);
   const intWarn = Math.min(intErr + 5, 100);
 
+  const latestPortRes = await axios.get(
+    'https://api.jetty.systems.admin.tr8.tech/api/v1/service/latest',
+  );
+
+  const latestPort = latestPortRes.data as {
+    devPort: number;
+    testPort: number;
+    localPort: number;
+  };
+
   const vars = {
     projectName,
     desc,
     platform,
     service,
     port: {
-      local: '3000',
-      dev: '11000',
-      test: '11001',
+      local: `${latestPort.localPort}`,
+      dev: `${latestPort.devPort}`,
+      test: `${latestPort.testPort}`,
     },
     team,
     test: {
@@ -205,27 +221,22 @@ async function start(): Promise<[string, string]> {
       },
     },
   };
-
+  const reqLandscape = await axios.get(
+    'https://api.jetty.systems.admin.tr8.tech/api/v1/landscape',
+  );
+  const landscapesOpt = reqLandscape.data as {
+    name: string;
+    slug: string;
+    description: string;
+  }[];
   // ask for all landscapes
   const prodLandscapes = await checkbox({
     message: 'Select landscapes that apply',
-    choices: [
-      {
-        name: 'Staging',
-        value: 'staging',
-        checked: true,
-      },
-      {
-        name: 'Admin',
-        value: 'admin',
-        checked: false,
-      },
-      {
-        name: 'Production Indo',
-        value: 'prod-indo',
-        checked: false,
-      },
-    ],
+    choices: landscapesOpt.map(({ name, slug }) => ({
+      name,
+      value: slug,
+      checked: false,
+    })),
   });
 
   const landscapes = ['ci', 'local', 'local-prod', 'test', ...prodLandscapes];
@@ -319,6 +330,19 @@ async function start(): Promise<[string, string]> {
     ...tf,
     ...migrations,
   ];
+  console.info('🎯 Local Port:', vars.port.local);
+  console.info('🎯 Dev Port:', vars.port.dev);
+  console.info('🎯 Test Port:', vars.port.test);
+  console.info('🛎️ Service Name:', vars.service);
+  console.info('🛎️ Service Slug:', vars.service.toLowerCase());
+  console.info('🛎️ Service Description:', vars.desc);
+
+  const c = await confirm({ message: 'Confirm?' });
+
+  if (!c) {
+    console.info('🚨 User aborted');
+    process.exit(0);
+  }
 
   const all = files.map(async ([p, value]) => {
     console.info('Writing', p);
@@ -326,7 +350,25 @@ async function start(): Promise<[string, string]> {
     console.info('✅ Write Completed', p);
   });
   await Promise.all(all);
-  console.log('Rendered all values');
+  console.info('Rendered all values');
+
+  console.info('⬆️ Updating Jetty...');
+  const jettyRes = await axios.post(
+    'https://api.jetty.systems.admin.tr8.tech/api/v1/service',
+    {
+      name: vars.service,
+      slug: vars.service.toLowerCase(),
+      description: vars.desc,
+      localPort: parseInt(vars.port.local),
+      devPort: parseInt(vars.port.dev),
+      testPort: parseInt(vars.port.test),
+    },
+  );
+
+  if (jettyRes.status == 201) return [platform, service];
+  console.info(
+    chalk.bgRedBright('failed to update Jetty, please contact ESD team'),
+  );
   return [platform, service];
 }
 
@@ -345,14 +387,14 @@ async function main() {
       del(path.resolve(__dirname, '../ci.yaml')),
       del(path.resolve(__dirname, '../tests/controller.spec')),
       del(path.resolve(__dirname, '../person.yaml')),
+      del(path.resolve(__dirname, '../pnpm-lock.yaml')),
     ]);
     const [platform, service] = await start();
     sync();
     remove();
-    const p = execa('helm', ['dependency', 'update', './infra/root_chart']);
-    p.stdout?.pipe(process.stdout);
-    p.stderr?.pipe(process.stderr);
-    await p;
+    await run('helm', ['dependency', 'update', './infra/root_chart']);
+    await run('pnpm', ['i', 'update', './infra/root_chart']);
+
     console.info('✅ Initialized repository');
     console.info('');
     console.info(

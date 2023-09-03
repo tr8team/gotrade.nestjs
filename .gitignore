@@ -14,6 +14,7 @@ debug.yaml
 debug.*.yaml
 
 scaffold/templates/**/*.md
+!scaffold/templates/**/README.TPL.MD
 
 test-results
 

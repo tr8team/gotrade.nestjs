@@ -49,6 +49,12 @@ tasks:
       - task: build:clean
       - task: test:clean
 
+  update:deps:
+    desc: Update node packages
+    interactive: true
+    cmds:
+      - pnpm up -i --latest
+
   # Quality Assurance
   check:
     desc: Run pre-commit

@@ -11,6 +11,6 @@ data:
     {{- $path := printf "%s%s.config.yaml" "app/" .Values.serviceTree.landscape -}}
     {{- $fileContent := .Files.Get $path -}}
     {{- $config := fromYaml $fileContent -}}
-    {{- $final := merge $config .Values.config -}}
+    {{- $final := merge .Values.config $config -}}
     {{- toYaml $final | nindent 4 }}
 

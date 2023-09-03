@@ -41,17 +41,23 @@ tasks:
       - task: build:clean
       - task: test:clean
 
+  update:deps:
+    desc: Update node packages
+    interactive: true
+    cmds:
+      - pnpm up -i --latest
+
   # Quality Assurance
   check:
     desc: Run pre-commit
     cmds:
       - pre-commit run --all
-  
+
   gen:
     desc: Generate
     cmds:
       - ts-node ./scaffold/generator.ts {{.CLI_ARGS}}
-      -
+
   generate:config:schema:
     desc: Generates configuration schema for better IDE completions
     cmds:
