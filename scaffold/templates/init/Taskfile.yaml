@@ -47,6 +47,11 @@ tasks:
     cmds:
       - pnpm up -i --latest
 
+  sync:
+    desc: Sync Chart.yaml, constants.ts and Taskfile.orm.yml
+    cmds:
+      - ts-node ./scaffold/sync.ts
+
   # Quality Assurance
   check:
     desc: Run pre-commit

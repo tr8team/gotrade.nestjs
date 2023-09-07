@@ -6,7 +6,7 @@ import { GenChart, GenConstants, GenValues, StoreConfig } from '../lib/store';
 
 function syncStore(content: string) {
   const config = yaml.load(content) as {
-    caches: StoreConfig;
+    storages: StoreConfig;
   };
 
   const [slashStart, slashEnd] = [
@@ -23,7 +23,7 @@ function syncStore(content: string) {
     resolve(__dirname, '../../infra/root_chart/values.yaml'),
     hexStart,
     hexEnd,
-    GenValues(config.caches),
+    GenValues(config.storages),
   );
 
   // Do constants file
@@ -31,7 +31,7 @@ function syncStore(content: string) {
     resolve(__dirname, '../../src/constants.ts'),
     slashStart,
     slashEnd,
-    GenConstants(config.caches),
+    GenConstants(config.storages),
   );
 
   // Do chart file
@@ -39,7 +39,7 @@ function syncStore(content: string) {
     resolve(__dirname, '../../infra/root_chart/Chart.yaml'),
     hexStart,
     hexEnd,
-    GenChart(config.caches),
+    GenChart(config.storages),
   );
 }
 
