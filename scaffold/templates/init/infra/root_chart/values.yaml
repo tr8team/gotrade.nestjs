@@ -3,7 +3,7 @@ serviceTree: &serviceTree
   platform: <% platform %>
   service: <% service %>
   layer: "2"
-  team: <% team %>
+  team: <% team.toUpperCase() %>
 
 secret:
   name: &secret "<% platform %>-<% service %>-secrets"
