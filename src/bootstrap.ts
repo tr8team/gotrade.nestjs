@@ -1,6 +1,7 @@
 import {
   INestApplication,
   RequestMethod,
+  ValidationPipe,
   VersioningType,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -53,6 +54,12 @@ async function bootstrap(): Promise<[INestApplication, HostConfig]> {
   app.useLogger(app.get(Logger));
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
   app.enableVersioning({ type: VersioningType.URI });
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
   app.setGlobalPrefix('api', {
     exclude: [
       {
