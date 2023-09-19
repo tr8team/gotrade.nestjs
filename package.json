@@ -92,7 +92,7 @@
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
-    "execa": "5.1.1",
+    "execa": "8.0.1",
     "glob": "^10.3.4",
     "light-my-request": "^5.11.0",
     "source-map-support": "^0.5.21",
