@@ -81,7 +81,7 @@ EOF
     stop_tilt
   }
   trap cleanup EXIT
-  doppler run -p "$platform-$service" -c "$landscape" -- mirrord exec --context "k3d-$landscape" --target "$target" --fs-mode local -e -n "$platform" -- ts-node ./src/wait.ts
+  doppler run -p "$platform-$service" -c "$landscape" -- mirrord exec --context "k3d-$landscape" --target "$target" --fs-mode local -e -n "$platform" -- nest start --entryFile ./src/wait
   # shellcheck disable=SC2086
   doppler run -p "$platform-$service" -c "$landscape" -- mirrord exec --context "k3d-$landscape" --target "$target" --fs-mode local -e -n "$platform" -- $test
 fi
