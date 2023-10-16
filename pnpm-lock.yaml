@@ -269,8 +269,8 @@ devDependencies:
     specifier: ^5.2.2
     version: 5.2.2
   typescript-json-schema:
-    specifier: ^0.61.0
-    version: 0.61.0
+    specifier: ^0.62.0
+    version: 0.62.0
   vite:
     specifier: ^4.4.11
     version: 4.4.11(@types/node@20.8.4)
@@ -7854,8 +7854,8 @@ packages:
   /typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
-  /typescript-json-schema@0.61.0:
-    resolution: {integrity: sha512-sYKnLJjvh9ljdSQkh91LM9PEzgzrgnYfvU226IauISFd+379VCti/VtAFXd00Z9euLkVffh5LRTAO8eamsxUlw==}
+  /typescript-json-schema@0.62.0:
+    resolution: {integrity: sha512-qRO6pCgyjKJ230QYdOxDRpdQrBeeino4v5p2rYmSD72Jf4rD3O+cJcROv46sQukm46CLWoeusqvBgKpynEv25g==}
     hasBin: true
     dependencies:
       '@types/json-schema': 7.0.13
