@@ -53,9 +53,9 @@ if [ "$mode" = 'cluster' ]; then
     stop_tilt
   }
   trap cleanup EXIT
-  tilt up --port "$port"
+  tilt up --port "$port" --host "0.0.0.0"
 else
-  tilt up --port "$port" &
+  tilt up --port "$port" --host "0.0.0.0" &
 
   name="$platform-$service-dev-proxy"
   target="pod/$name"

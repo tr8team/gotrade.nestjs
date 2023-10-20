@@ -54,10 +54,10 @@ if [ "$mode" = 'cluster' ]; then
     stop_tilt
   }
   trap cleanup EXIT
-  tilt up --port "$port" -- --config "$file" --action test --command "$test"
+  tilt up --port "$port" --host "0.0.0.0" -- --config "$file" --action test --command "$test"
 else
   export LANDSCAPE="$landscape"
-  tilt up --port "$port" -- --config "$file" --action test &
+  tilt up --port "$port" --host "0.0.0.0" -- --config "$file" --action test &
 
   name="$platform-$service-test-proxy"
   target="pod/$name"
