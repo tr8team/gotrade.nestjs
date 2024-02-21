@@ -46,7 +46,6 @@ with packages;
     wrangler
     node
     sg
-    npm
     docker
     helm
     yq-go
