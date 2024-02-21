@@ -10,7 +10,8 @@
     nixpkgs-2305.url = "nixpkgs/nixos-23.05";
     nixpkgs-may-13-23.url = "nixpkgs/d485da9d0034a72ceb9679c2ab0156c073f66b82";
     nixpkgs-aug-01-23.url = "nixpkgs/9418167277f665de6f4a29f414d438cf39c55b9e";
-    atomipkgs.url = "github:kirinnee/test-nix-repo/v23.0.1";
+    atomipkgs.url = "github:kirinnee/test-nix-repo/v22.0.1";
+    atomipkgs_classic.url = "github:kirinnee/test-nix-repo/classic";
   };
   outputs =
     { self
@@ -22,6 +23,7 @@
 
       # registries
     , atomipkgs
+    , atomipkgs_classic
     , nixpkgs
     , nixpkgs-2305
     , nixpkgs-may-13-23
@@ -36,6 +38,7 @@
         pkgs-may-13-23 = nixpkgs-may-13-23.legacyPackages.${system};
         pkgs-aug-01-23 = nixpkgs-aug-01-23.legacyPackages.${system};
         atomi = atomipkgs.packages.${system};
+        atomi_classic = atomipkgs_classic.packages.${system};
         pre-commit-lib = pre-commit-hooks.lib.${system};
       in
       let
@@ -47,7 +50,7 @@
             inherit treefmt-nix pkgs;
           };
           packages = import ./nix/packages.nix {
-            inherit pkgs atomi pkgs-2305 pkgs-may-13-23 pkgs-aug-01-23;
+            inherit pkgs atomi atomi_classic pkgs-2305 pkgs-may-13-23 pkgs-aug-01-23;
           };
           env = import ./nix/env.nix {
             inherit pkgs packages;
