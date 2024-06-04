@@ -1,10 +1,5 @@
-import { CommentPrincipal } from './comment.model';
-
 class Blog {
-  constructor(
-    readonly principal: BlogPrincipal,
-    readonly comments: CommentPrincipal[],
-  ) {}
+  constructor(readonly principal: BlogPrincipal) {}
 }
 
 class BlogPrincipal {

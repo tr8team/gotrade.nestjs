@@ -2,8 +2,6 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Blog, BlogPrincipal, BlogRecord } from './models/blog.model';
 import { IBlogRepository } from './blog.repository';
 import { BlogRepository } from '../adapters/database/blog.repository';
-import { CommentRepository } from '../adapters/database/comment.repository';
-import { ICommentRepository } from './comment.repository';
 
 interface IBlogService {
   search(
@@ -23,10 +21,7 @@ interface IBlogService {
 
 @Injectable()
 class BlogService implements IBlogService {
-  constructor(
-    @Inject(BlogRepository) private readonly repo: IBlogRepository,
-    @Inject(CommentRepository) private readonly commentRepo: ICommentRepository,
-  ) {}
+  constructor(@Inject(BlogRepository) private readonly repo: IBlogRepository) {}
 
   create(blog: BlogRecord): Promise<BlogPrincipal> {
     return this.repo.create(blog);
@@ -39,13 +34,8 @@ class BlogService implements IBlogService {
   async get(id: string): Promise<Blog | null> {
     const blog = await this.repo.get(id);
     if (blog == null) return blog;
-    const comments = await this.commentRepo.search(
-      undefined,
-      undefined,
-      undefined,
-      id,
-    );
-    return new Blog(blog, comments);
+
+    return new Blog(blog);
   }
 
   search(

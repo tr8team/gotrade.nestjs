@@ -53,45 +53,20 @@ databases:
         transactional: false
       seeder:
         path: './seeders/database/main'
+    # connection:
+    #   port: 5432
+    #   database: main
+    #   password: supersecret
+    #   type: postgresql
+    #   user: admin
+    #   host: gotrade-nestjs-main-database.gotrade.svc
     connection:
-      port: 5432
-      database: main
-      password: supersecret
       type: postgresql
-      user: admin
-      host: gotrade-nestjs-main-database.gotrade.svc
-    dev:
-      autoMigrate: true
-      autoSeed: true
-      timeout: 120
-    migration:
-      migrate: true
-      seed: true
-      timeout: 60
-  comment:
-    orm:
-      schemaGenerator:
-        disableForeignKeys: false
-      entities: ['./dist/src/**/entities/comment/*.entity.js']
-      entitiesTs: ['./src/**/entities/comment/*.entity.ts']
-      migrations:
-        path: './migrations/comment'
-        pathTs: './migrations/comment'
-        allOrNothing: true
-        disableForeignKeys: false
-        dropTables: false
-        safe: true
-        snapshot: true
-        transactional: false
-      seeder:
-        path: './seeders/database/comment'
-    connection:
-      port: 3306
-      database: comment
+      port: 5432
+      user: postgres
       password: supersecret
-      type: mysql
-      user: admin
-      host: gotrade-nestjs-comment-database.gotrade.svc
+      database: main
+      host: 127.0.0.1
     dev:
       autoMigrate: true
       autoSeed: true
@@ -107,10 +82,21 @@ caches:
       autoSeed: false
     dev:
       autoSeed: false
+    # connection:
+    #   port: 6379
+    #   host: gotrade-nestjs-main-cache.gotrade.svc
+    #   password: supersecret
+    #   autoResubscribe: true
+    #   commandTimeout: 2000 # 2 seconds
+    #   connectTimeout: 120000 # 120 seconds
+    #   enableAutoPipelining: true
+    #   keyPrefix: main
+    #   tls: false
+    #   readOnly: false
     connection:
-      port: 6379
-      host: gotrade-nestjs-main-cache.gotrade.svc
-      password: supersecret
+      port: 7381
+      host: 127.0.0.1
+      password:
       autoResubscribe: true
       commandTimeout: 2000 # 2 seconds
       connectTimeout: 120000 # 120 seconds
@@ -119,20 +105,4 @@ caches:
       tls: false
       readOnly: false
 
-storages:
-  main:
-    connection:
-      port: 9000
-      useSSL: false
-      endpoint: gotrade-nestjs-main-storage.gotrade.svc
-      access: admin
-      secret: supersecret
-      bucket: main
-    dev:
-      autoSeed: true
-      timeout: 120
-      autoMigrate: true
-    migration:
-      autoMigrate: false
-      timeout: 60
-      autoSeed: false
+storages: {}

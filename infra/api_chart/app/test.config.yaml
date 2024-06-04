@@ -17,9 +17,5 @@ caches:
   main:
     dev:
       autoSeed: true
-storages:
-  main:
-    dev:
-      autoSeed: true
-      autoMigrate: true
-      timeout: 120
+
+storages: {}

@@ -1,6 +1,5 @@
 import { OrmModule } from './infra/orm.module';
 import { ICacheSeeder } from '../seeders/CacheSeeder';
-import { StorageModule } from './infra/storage.module';
 import { RedisModule } from './infra/redis.module';
 import { Constructor } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
@@ -9,13 +8,9 @@ import { IStorageSeeder } from '../seeders/StorageSeeder';
 //--scaffold database start--
 const contexts = {
   MAIN: 'main',
-  COMMENT: 'comment',
 } as const;
 
-const dbModules = [
-  OrmModule.register(contexts.MAIN),
-  OrmModule.register(contexts.COMMENT),
-] as const;
+const dbModules = [OrmModule.register(contexts.MAIN)] as const;
 //--scaffold database end--
 
 //--scaffold cache start--
@@ -31,7 +26,7 @@ const stores = {
   MAIN: Symbol('main'),
 } as const;
 
-const storeModules = [StorageModule.register('main', stores)] as const;
+const storeModules = [] as const;
 //--scaffold storage end--
 
 const dbSeeders: Record<string, Constructor<Seeder> | undefined | null> = {};
