@@ -68,15 +68,5 @@ caches:
       autoSeed: true
     connection:
       tls: true
-storages:
-  main:
-    dev:
-      autoMigrate: false
-      autoSeed: false
-    migration:
-      autoSeed: true
-      autoMigrate: true
-    connection:
-      port: 443
-      useSSL: true
-      endpoint: s3.amazonaws.com
+
+storages: {}

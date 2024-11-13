@@ -30,7 +30,7 @@ class BlogDataMapper {
   }
 
   toDomain(data: BlogEntity): Blog {
-    return new Blog(this.toPrincipal(data), []);
+    return new Blog(this.toPrincipal(data));
   }
 }
 

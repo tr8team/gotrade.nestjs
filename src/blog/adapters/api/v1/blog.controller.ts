@@ -17,10 +17,9 @@ import { BlogService, IBlogService } from '../../../domain/blog.service';
 import { BlogPrincipalRes, BlogRes } from './dto/blog.res';
 import { CreateBlogReq, SearchBlogQuery } from './dto/blog.req';
 import { BlogApiV1Mapper } from './blog.mapper';
-import { redis, stores } from '../../../../constants';
+import { redis } from '../../../../constants';
 import { ApiBody, ApiConsumes, ApiProperty } from '@nestjs/swagger';
 import Redis from 'ioredis';
-import { StorageService } from '../../../../infra/services/storage.service';
 import { ConfigService } from '@nestjs/config';
 import { File, FileInterceptor } from '@nest-lab/fastify-multer';
 import { PinoLogger } from 'nestjs-pino';
@@ -39,7 +38,6 @@ export class BlogV1Controller {
     @Inject(BlogApiV1Mapper) private readonly mapper: BlogApiV1Mapper,
     @Inject(PinoLogger) private readonly logger: PinoLogger,
     @Inject(redis.MAIN) private readonly cache: Redis,
-    @Inject(stores.MAIN) private readonly storage: StorageService,
     @Inject(ConfigService) private readonly config: ConfigService,
   ) {}
 
@@ -121,8 +119,6 @@ export class BlogV1Controller {
       const span = trace.getSpan(context.active());
       console.log('span', span);
       this.logger.info(file.buffer?.toString());
-      const r = await this.storage.putObject('test', file.buffer!);
-      this.logger.info(r);
       return 'ok';
     } catch (e) {
       this.logger.error(e);
